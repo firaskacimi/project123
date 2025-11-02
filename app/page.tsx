@@ -1,65 +1,132 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import TopVentes from "@/components/TopVentes";
+
+const Index = () => {
+  const topProducts = [
+    { name: "Clavier RGB", img: "/keyboard.jpg" },
+    { name: "Souris gaming", img: "/mouse.jpg" },
+    { name: "Accessoires PC", img: "/accessories.jpg" },
+    { name: "Chargeur portable", img: "/charger.jpg" },
+  ];
+
+  const categories = [
+    { name: "PC", img: "/gaming-pc.jpg" },
+    { name: "SOURIS", img: "/mouse.jpg" },
+    { name: "CLAVIER", img: "/keyboard.jpg" },
+    { name: "CPU / GPU", img: "/cpu-gpu.jpg" },
+  ];
+
+  const benefits = [
+    "Qualité garantie",
+    "Prix compétitifs",
+    "Large choix",
+    "Service client réactif",
+    "Livraison rapide et sécurisée",
+    "Garantie & support",
+  ];
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className="min-h-screen text-zinc-100 bg-linear-to-b from-zinc-950 via-zinc-900 to-zinc-950 selection:bg-cyan-400/30 selection:text-white">
+      {/* Hero Section */}
+      <section className="relative h-[90vh] flex flex-col items-center justify-center text-center overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-40"
+          style={{ backgroundImage: `url('/hero-gaming.png')` }}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+        <div className="absolute inset-0 bg-linear-to-b from-black/80 via-black/60 to-black/90 backdrop-saturate-150" />
+
+        <div className="relative z-10 max-w-4xl px-4 space-y-6 animate-fade-in">
+          <h1 className="text-5xl md:text-6xl font-bold leading-tight tracking-tight text-balance">
+            Boostez vos performances avec le meilleur{" "}
+            <span className="bg-linear-to-r from-cyan-400 via-purple-500 to-fuchsia-500 bg-clip-text text-transparent animate-[linearShift_4s_ease-in-out_infinite]">
+              du matériel informatique
+            </span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <p className="text-gray-300 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed overflow-wrap-wrap-anywhere">
+            Trouvez tout l’équipement dont vous avez besoin pour améliorer votre
+            setup : ordinateurs, périphériques, accessoires gaming et plus encore.
           </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
+            <button className="bg-cyan-400 text-black font-semibold text-lg px-8 py-4 rounded-xl shadow-lg shadow-cyan-500/30 hover:bg-cyan-300 hover:shadow-cyan-500/50 transition duration-300">
+              SHOP NOW
+            </button>
+            <button className="border border-purple-400 text-purple-400 hover:bg-purple-600/80 hover:text-white font-semibold text-lg px-8 py-4 rounded-xl shadow-lg shadow-purple-500/20 transition duration-300">
+              Se connecter
+            </button>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-linear-to-r from-transparent via-cyan-400 to-transparent opacity-50 animate-pulse" />
+      </section>
+
+      {/* Top Ventes */}
+      <TopVentes />
+
+      {/* Categories */}
+      <section className="relative py-24 px-6 md:px-12 bg-zinc-950 overflow-hidden">
+        <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-3xl animate-[float_6s_ease-in-out_infinite]" />
+        <div
+          className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-3xl animate-[float_6s_ease-in-out_infinite]"
+          style={{ animationDelay: "2s" }}
+        />
+
+        <div className="relative z-10 max-w-7xl mx-auto text-center">
+          <h2 className="text-4xl md:text-5xl font-bold mb-16 bg-linear-to-r from-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
+            Catégories de produits
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {categories.map((item, idx) => (
+              <div
+                key={idx}
+                className="group relative rounded-2xl overflow-hidden border border-zinc-700 bg-zinc-900 hover:border-purple-500 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(168,85,247,0.3)]"
+              >
+                <div className="aspect-4/3 overflow-hidden">
+                  <img
+                    src={item.img}
+                    alt={item.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                </div>
+                <div className="p-5">
+                  <p className="text-xl font-semibold text-purple-400 group-hover:text-fuchsia-400 transition-colors duration-300">
+                    {item.name}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* Pourquoi acheter chez nous */}
+      <section className="py-24 px-6 md:px-12 text-center bg-zinc-950 relative">
+        <div className="max-w-5xl mx-auto relative z-10">
+          <h2 className="text-4xl md:text-5xl font-bold mb-16 bg-linear-to-r from-cyan-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
+            Pourquoi acheter chez nous ?
+          </h2>
+
+          <div className="flex flex-wrap justify-center gap-4">
+            {benefits.map((text, idx) => (
+              <div
+                key={idx}
+                className="border border-cyan-500/40 bg-zinc-900/80 backdrop-blur-md rounded-xl px-6 py-3 font-medium text-white hover:bg-cyan-400 hover:text-black hover:shadow-[0_0_25px_rgba(0,217,255,0.4)] transition-all duration-300"
+              >
+                {text}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Footer Accent */}
+      <div className="h-0.5 bg-linear-to-r from-cyan-400 via-purple-400 to-fuchsia-400 opacity-80" />
+    </main>
   );
-}
+};
+
+export default Index;
+    
