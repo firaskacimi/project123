@@ -98,7 +98,7 @@ export default function Navbar() {
               onClick={() => setShowUserMenu(!showUserMenu)}
               className="flex items-center gap-2 font-semibold hover:text-cyan-400 transition"
             >
-              👤 {user.name || "User"}
+               {user.name || "User"}
             </button>
 
             {showUserMenu && (
@@ -135,7 +135,7 @@ export default function Navbar() {
 
           {showCart && (
             <div
-              id="mini-cart"
+              id="/cart"
               className="absolute right-0 mt-4 w-96 bg-[#0b0e17] border border-cyan-700/60 rounded-2xl shadow-2xl p-5 text-sm backdrop-blur-xl"
             >
               <h2 className="text-lg font-semibold text-cyan-400 mb-3 border-b border-cyan-700/50 pb-2">

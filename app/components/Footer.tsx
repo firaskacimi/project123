@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer className="bg-[#0b0e17] text-gray-300 border-t border-blue-900 mt-0">
       {/* Gradient line to match your theme */}
-      <div className="h-[2px] bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500" />
+      <div className="h-0.5 bg-linear-to-r from-cyan-400 via-blue-500 to-purple-500" />
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Brand */}
