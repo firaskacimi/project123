@@ -93,7 +93,7 @@ export default function LoginPage() {
   return (
     <div className={`min-h-screen flex bg-neutral-950 text-white overflow-hidden transition-all duration-700 ${fadeIn ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
       <div className="hidden md:flex w-1/2 relative items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-br from-cyan-500/30 via-purple-500/20 to-fuchsia-500/20 animate-linear-shift bg-[length:200%_200%]" />
+        <div className="absolute inset-0 bg-linear-to-br from-cyan-500/30 via-purple-500/20 to-fuchsia-500/20 animate-linear-shift bg-size[200%_200%]" />
         <div className="relative z-10 text-center max-w-md px-6">
           <h1 className="text-5xl font-bold mb-4 bg-linear-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">Bienvenue</h1>
           <p className="text-gray-300 text-lg">Connectez-vous pour retrouver vos produits, vos commandes et vos préférences gaming.</p>

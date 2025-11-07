@@ -1,8 +1,11 @@
 "use client";
 
 import TopVentes from "@/components/TopVentes";
+import { useRouter } from "next/navigation";
 
 const Index = () => {
+  const router = useRouter();
+
   const topProducts = [
     { name: "Clavier RGB", img: "/keyboard.jpg" },
     { name: "Souris gaming", img: "/mouse.jpg" },
@@ -11,10 +14,12 @@ const Index = () => {
   ];
 
   const categories = [
-    { name: "PC", img: "/gaming-pc.jpg" },
-    { name: "SOURIS", img: "/mouse.jpg" },
-    { name: "CLAVIER", img: "/keyboard.jpg" },
-    { name: "CPU / GPU", img: "/cpu-gpu.jpg" },
+    { id: "690a3b9e26ebf05ce130b91b", name: "Ordinateurs Complets", img: "/gaming-pc.jpg" },
+    { id: "690a3bab26ebf05ce130b91e", name: "Souris", img: "/mouse.jpg" },
+    { id: "690a3bb426ebf05ce130b921", name: "Claviers", img: "/keyboard.jpg" },
+    { id: "690a3bbc26ebf05ce130b924", name: "CPU", img: "/cpu.jpg" },
+    { id: "690a3bcb26ebf05ce130b927", name: "GPU", img: "/gpu.jpg" },
+    { id: "690a3bd126ebf05ce130b92a", name: "Écrans", img: "/screen.jpg" },
   ];
 
   const benefits = [
@@ -78,11 +83,12 @@ const Index = () => {
             Catégories de produits
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {categories.map((item, idx) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {categories.map((item) => (
               <div
-                key={idx}
-                className="group relative rounded-2xl overflow-hidden border border-zinc-700 bg-zinc-900 hover:border-purple-500 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(168,85,247,0.3)]"
+                key={item.id}
+                onClick={() => router.push(`/products/${item.id}`)}
+                className="group relative cursor-pointer rounded-2xl overflow-hidden border border-zinc-700 bg-zinc-900 hover:border-purple-500 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(168,85,247,0.3)]"
               >
                 <div className="aspect-4/3 overflow-hidden">
                   <img
@@ -122,11 +128,9 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer Accent */}
       <div className="h-0.5 bg-linear-to-r from-cyan-400 via-purple-400 to-fuchsia-400 opacity-80" />
     </main>
   );
 };
 
 export default Index;
-    
