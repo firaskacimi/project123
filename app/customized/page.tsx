@@ -6,19 +6,7 @@ interface PCOption {
   price: number;
 }
 
-interface PCModel {
-  name: string;
-  description: string;
-}
-
 export default function CustomizePCPage() {
-  // PC Models
-  const pcModels: PCModel[] = [
-    { name: "Gamer X", description: "High-end gaming beast with RGB lights" },
-    { name: "Creator Pro", description: "Powerful workstation for creators" },
-    { name: "Stealth Elite", description: "Sleek design with top-tier performance" }, // 3rd model
-  ];
-
   // Sample options
   const cpuOptions: PCOption[] = [
     { name: "Intel i7 13700K", price: 450 },
@@ -45,43 +33,19 @@ export default function CustomizePCPage() {
   ];
 
   // Selected state
-  const [selectedModel, setSelectedModel] = useState(pcModels[0]);
   const [selectedCPU, setSelectedCPU] = useState(cpuOptions[0]);
   const [selectedGPU, setSelectedGPU] = useState(gpuOptions[0]);
   const [selectedRAM, setSelectedRAM] = useState(ramOptions[0]);
   const [selectedStorage, setSelectedStorage] = useState(storageOptions[0]);
 
-  const totalPrice =
-    selectedCPU.price + selectedGPU.price + selectedRAM.price + selectedStorage.price;
+  const totalPrice = selectedCPU.price + selectedGPU.price + selectedRAM.price + selectedStorage.price;
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-8">
+    <div className="min-h-screen text-white p-8">
       <h1 className="text-4xl font-extrabold text-center mb-12 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
         Customize Your PC
       </h1>
 
-      {/* PC Model Selection */}
-      <section className="max-w-4xl mx-auto mb-12">
-        <h2 className="text-2xl font-bold mb-4">Select PC Model</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {pcModels.map((model) => (
-            <button
-              key={model.name}
-              onClick={() => setSelectedModel(model)}
-              className={`p-6 rounded-2xl border-2 transition-colors hover:border-cyan-500 ${
-                selectedModel.name === model.name
-                  ? "border-cyan-400 bg-gray-900 text-white"
-                  : "border-gray-700 bg-gray-800 text-gray-300"
-              }`}
-            >
-              <h3 className="text-xl font-bold mb-2">{model.name}</h3>
-              <p className="text-gray-400">{model.description}</p>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* Component Selection */}
       <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
         {/* CPU */}
         <div className="bg-gray-900 rounded-3xl p-6 shadow-lg hover:shadow-cyan-500/50 transition-shadow">
@@ -159,9 +123,6 @@ export default function CustomizePCPage() {
       {/* Summary */}
       <div className="max-w-3xl mx-auto mt-12 bg-gray-900 rounded-3xl p-6 text-center shadow-lg">
         <h2 className="text-2xl font-bold mb-4">Summary</h2>
-        <p className="mb-4">
-          <span className="font-semibold">Model:</span> {selectedModel.name}
-        </p>
         <p className="mb-4">
           <span className="font-semibold">CPU:</span> {selectedCPU.name} (${selectedCPU.price})
         </p>

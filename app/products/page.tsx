@@ -79,7 +79,7 @@ export default function ProductsPage() {
     );
 
   return (
-    <div className="min-h-screen bg-[#0b0e17] text-white pt-24 px-6 py-50 md:px-12">
+    <div className="min-h-screen  text-white pt-24 px-6 py-50 md:px-12">
       <h1 className="text-4xl font-bold mb-8 text-center bg-linear-to-r from-cyan-400 to-purple-400 text-transparent bg-clip-text">
         Nos Produits
       </h1>
