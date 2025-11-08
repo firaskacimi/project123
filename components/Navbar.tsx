@@ -11,28 +11,13 @@ export default function Navbar() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const pathname = usePathname();
 
-  // Click outside handler for user menu
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const userMenu = document.getElementById("user-menu");
-      if (userMenu && !userMenu.contains(event.target as Node)) {
-        setShowUserMenu(false);
-      }
-    };
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
-
-  // Load user & cart
+  // ✅ Load cart & user from localStorage
   useEffect(() => {
     const loadUser = () => {
       try {
         const stored = localStorage.getItem("user");
-        if (stored && stored !== "undefined") {
-          setUser(JSON.parse(stored));
-        } else {
-          setUser(null);
-        }
+        if (stored && stored !== "undefined") setUser(JSON.parse(stored));
+        else setUser(null);
       } catch {
         localStorage.removeItem("user");
         setUser(null);
@@ -51,24 +36,40 @@ export default function Navbar() {
     loadUser();
     loadCart();
 
-    // Listen for updates
+    // ✅ Listen to events from ProductDetails
     const handleUserUpdated = () => loadUser();
-    const handleCartUpdated = () => loadCart();
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key === "user") loadUser();
-      if (e.key === "cart") loadCart();
+    const handleCartUpdated = () => {
+      loadCart();
+      // Optional: re-render the cart icon
+      setShowCart(false);
+      setTimeout(() => setShowCart(true), 0);
     };
 
+    // ✅ Listen to localStorage and custom events
     window.addEventListener("userUpdated", handleUserUpdated);
     window.addEventListener("cartUpdated", handleCartUpdated);
-    window.addEventListener("storage", handleStorage);
+    window.addEventListener("storage", (e) => {
+      if (e.key === "cart") loadCart();
+      if (e.key === "user") loadUser();
+    });
 
     return () => {
       window.removeEventListener("userUpdated", handleUserUpdated);
       window.removeEventListener("cartUpdated", handleCartUpdated);
-      window.removeEventListener("storage", handleStorage);
     };
   }, [pathname]);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const userMenu = document.getElementById("user-menu");
+      if (userMenu && !userMenu.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -88,7 +89,7 @@ export default function Navbar() {
         </Link>
       </div>
 
-      {/* Desktop Links */}
+      {/* Desktop Nav */}
       <nav className="hidden md:flex gap-10 text-sm font-medium">
         <Link href="/" className="hover:text-cyan-400 transition">HOME</Link>
         <Link href="/products" className="hover:text-cyan-400 transition">PRODUCTS</Link>
@@ -100,10 +101,9 @@ export default function Navbar() {
         )}
       </nav>
 
-      {/* User & Cart */}
+      {/* User + Cart */}
       <div className="hidden md:flex items-center gap-6 relative">
-
-        {/* Not logged in */}
+        {/* Auth */}
         {!user ? (
           <Link
             href="/login"
@@ -120,7 +120,7 @@ export default function Navbar() {
               }}
               className="flex items-center gap-2 font-semibold hover:text-cyan-400 transition"
             >
-            {user?.firstName || "User"}
+              {user.firstName || "User"}
             </button>
 
             {showUserMenu && (
@@ -142,7 +142,7 @@ export default function Navbar() {
           </div>
         )}
 
-        {/* Mini Cart */}
+        {/* 🛒 Cart Icon */}
         <div
           className="relative cursor-pointer hover:text-cyan-400 transition"
           onClick={() => setShowCart((s) => !s)}
@@ -154,7 +154,9 @@ export default function Navbar() {
 
           {showCart && (
             <div className="absolute right-0 mt-4 w-96 bg-[#0b0e17] border border-cyan-700/60 rounded-2xl shadow-2xl p-5 text-sm backdrop-blur-xl">
-              <h2 className="text-lg font-semibold text-cyan-400 mb-3 border-b border-cyan-700/50 pb-2">Votre panier</h2>
+              <h2 className="text-lg font-semibold text-cyan-400 mb-3 border-b border-cyan-700/50 pb-2">
+                Votre panier
+              </h2>
               {cart.length === 0 ? (
                 <p className="text-gray-400 text-center py-4">Panier vide</p>
               ) : (
@@ -170,7 +172,10 @@ export default function Navbar() {
                   ))}
                 </ul>
               )}
-              <Link href="/cart" className="block text-center mt-5 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg font-semibold transition">
+              <Link
+                href="/cart"
+                className="block text-center mt-5 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg font-semibold transition"
+              >
                 Voir le panier complet
               </Link>
             </div>
@@ -178,7 +183,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile */}
       <div className="md:hidden">
         <Menu />
       </div>
