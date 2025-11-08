@@ -39,11 +39,11 @@ export default function ContactUsPage() {
 
   return (
     <div
-      className={`min-h-screen text-white p-8 flex flex-col items-center transition-all duration-1000 ${
+      className={`min-h-screen py-50 text-white p-8 flex flex-col items-center transition-all duration-1000 ${
         fadeIn ? "opacity-100" : "opacity-0"
       }`}
     >
-      <h1 className="text-5xl font-extrabold mb-12 text-center bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent animate-fadeInDown">
+      <h1 className="text-5xl font-extrabold mb-12 text-center bg-linear-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent animate-fadeInDown">
         Contact Us
       </h1>
 

@@ -71,7 +71,7 @@ const Index = () => {
       <TopVentes />
 
       {/* Categories */}
-      <section className="relative py-24 px-6 md:px-12 bg-zinc-950 overflow-hidden">
+      <section className="relative py-24 px-6 md:px-12 overflow-hidden">
         <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-3xl animate-[float_6s_ease-in-out_infinite]" />
         <div
           className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-3xl animate-[float_6s_ease-in-out_infinite]"
@@ -109,7 +109,7 @@ const Index = () => {
       </section>
 
       {/* Pourquoi acheter chez nous */}
-      <section className="py-24 px-6 md:px-12 text-center bg-zinc-950 relative">
+      <section className="py-24 px-6 md:px-12 text-centerrelative">
         <div className="max-w-5xl mx-auto relative z-10">
           <h2 className="text-4xl md:text-5xl font-bold mb-16 bg-linear-to-r from-cyan-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
             Pourquoi acheter chez nous ?

@@ -35,7 +35,7 @@ export default function RootLayout({
           <Toaster position="top-center" />
           <div className="bg-[#030712]">
           <Navbar/>
-         <div className="py-15">{children}</div> 
+        <div>{children}</div> 
           <Footer/>
           </div>
         </QueryProvider>
