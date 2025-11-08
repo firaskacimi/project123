@@ -1,183 +1,151 @@
 "use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { useState } from "react";
 
-interface PCOption {
-  name: string;
-  price: number;
-}
-
-interface PCModel {
+interface Product {
+  _id: string;
   name: string;
   description: string;
+  price: number;
+  stockQuantity: number;
+  details?: string;
+  image?: string;
 }
 
-export default function CustomizePCPage() {
-  // PC Models
-  const pcModels: PCModel[] = [
-    { name: "Gamer X", description: "High-end gaming beast with RGB lights" },
-    { name: "Creator Pro", description: "Powerful workstation for creators" },
-    { name: "Stealth Elite", description: "Sleek design with top-tier performance" }, // 3rd model
-  ];
+async function fetchProducts(): Promise<Product[]> {
+  const res = await fetch("http://localhost:4000/products");
+  const data = await res.json();
 
-  // Sample options
-  const cpuOptions: PCOption[] = [
-    { name: "Intel i7 13700K", price: 450 },
-    { name: "AMD Ryzen 9 7900X", price: 500 },
-    { name: "Intel i9 14900K", price: 700 },
-  ];
+  if (!res.ok || !data.success) {
+    throw new Error(data.message || "Erreur lors du chargement des produits");
+  }
 
-  const gpuOptions: PCOption[] = [
-    { name: "NVIDIA RTX 4070", price: 600 },
-    { name: "AMD RX 7900 XT", price: 650 },
-    { name: "NVIDIA RTX 4080", price: 1200 },
-  ];
+  return data.data;
+}
 
-  const ramOptions: PCOption[] = [
-    { name: "16GB DDR5", price: 120 },
-    { name: "32GB DDR5", price: 220 },
-    { name: "64GB DDR5", price: 400 },
-  ];
+export default function ProductDetails() {
+  const pathname = usePathname();
+  const productId = pathname.split("/").pop();
+  const [added, setAdded] = useState(false);
 
-  const storageOptions: PCOption[] = [
-    { name: "1TB NVMe SSD", price: 100 },
-    { name: "2TB NVMe SSD", price: 180 },
-    { name: "4TB NVMe SSD", price: 350 },
-  ];
+  const { data, error, isLoading, isError } = useQuery({
+    queryKey: ["products"],
+    queryFn: fetchProducts,
+  });
 
-  // Selected state
-  const [selectedModel, setSelectedModel] = useState(pcModels[0]);
-  const [selectedCPU, setSelectedCPU] = useState(cpuOptions[0]);
-  const [selectedGPU, setSelectedGPU] = useState(gpuOptions[0]);
-  const [selectedRAM, setSelectedRAM] = useState(ramOptions[0]);
-  const [selectedStorage, setSelectedStorage] = useState(storageOptions[0]);
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-screen text-white text-2xl">
+        Chargement des produits...
+      </div>
+    );
 
-  const totalPrice =
-    selectedCPU.price + selectedGPU.price + selectedRAM.price + selectedStorage.price;
+  if (isError)
+    return (
+      <div className="flex items-center justify-center h-screen text-red-400 text-2xl">
+        Erreur : {(error as Error).message}
+      </div>
+    );
+
+  const product = data?.find((p) => p._id === productId);
+
+  if (!product)
+    return (
+      <div className="flex flex-col items-center justify-center h-screen text-gray-400 text-2xl">
+        Produit introuvable
+        <Link
+          href="/products"
+          className="mt-4 text-cyan-400 hover:text-purple-400 transition-colors"
+        >
+          ← Retour aux produits
+        </Link>
+      </div>
+    );
+
+  const addToCart = () => {
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const existing = cart.find((item: any) => item._id === product._id);
+
+    if (existing) {
+      existing.quantity += 1;
+    } else {
+      cart.push({ ...product, quantity: 1 });
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+    window.dispatchEvent(new Event("cartUpdated"));
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
+  };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-8">
-      <h1 className="text-4xl font-extrabold text-center mb-12 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
-        Customize Your PC
-      </h1>
+    <div className="min-h-screen bg-[#0b0e17] text-white pt-24 px-6 md:px-12">
+      <div className="max-w-5xl mx-auto bg-[#111827] rounded-2xl shadow-lg border border-cyan-800 p-8 flex flex-col md:flex-row gap-8">
+        {/* Left: Image */}
+        {product.image && (
+          <div className="shrink-0 w-full md:w-1/3">
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-full h-auto rounded-xl object-cover shadow-lg"
+            />
+          </div>
+        )}
 
-      {/* PC Model Selection */}
-      <section className="max-w-4xl mx-auto mb-12">
-        <h2 className="text-2xl font-bold mb-4">Select PC Model</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {pcModels.map((model) => (
-            <button
-              key={model.name}
-              onClick={() => setSelectedModel(model)}
-              className={`p-6 rounded-2xl border-2 transition-colors hover:border-cyan-500 ${
-                selectedModel.name === model.name
-                  ? "border-cyan-400 bg-gray-900 text-white"
-                  : "border-gray-700 bg-gray-800 text-gray-300"
+        {/* Right: Details */}
+        <div className="flex-1 flex flex-col justify-between">
+          <div>
+            <h1 className="text-4xl font-bold mb-4 text-cyan-400">
+              {product.name}
+            </h1>
+
+            <p className="text-gray-300 mb-4">
+              {product.description || "Aucune description disponible."}
+            </p>
+
+            {product.details && (
+              <div className="bg-[#0f172a] border border-cyan-900/40 rounded-xl p-5 mb-6">
+                <h2 className="text-xl font-semibold text-purple-400 mb-2">
+                  Détails du produit
+                </h2>
+                <p className="text-gray-300 leading-relaxed">
+                  {product.details}
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <span className="text-2xl font-bold text-purple-400">
+              {product.price} €
+            </span>
+
+            <span
+              className={`text-sm px-3 py-1 rounded-full ${
+                product.stockQuantity > 0
+                  ? "bg-green-600/30 text-green-400"
+                  : "bg-red-600/30 text-red-400"
               }`}
             >
-              <h3 className="text-xl font-bold mb-2">{model.name}</h3>
-              <p className="text-gray-400">{model.description}</p>
-            </button>
-          ))}
-        </div>
-      </section>
+              {product.stockQuantity > 0 ? "En stock" : "Rupture de stock"}
+            </span>
 
-      {/* Component Selection */}
-      <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
-        {/* CPU */}
-        <div className="bg-gray-900 rounded-3xl p-6 shadow-lg hover:shadow-cyan-500/50 transition-shadow">
-          <h2 className="text-2xl font-bold mb-4">CPU</h2>
-          {cpuOptions.map((cpu) => (
             <button
-              key={cpu.name}
-              onClick={() => setSelectedCPU(cpu)}
-              className={`w-full text-left p-3 rounded-xl mb-2 transition-colors ${
-                selectedCPU.name === cpu.name
-                  ? "bg-cyan-500 text-black font-semibold"
-                  : "bg-gray-800 hover:bg-gray-700"
+              onClick={addToCart}
+              disabled={product.stockQuantity <= 0}
+              className={`py-3 px-6 rounded-lg font-semibold transition-all duration-300 ${
+                product.stockQuantity > 0
+                  ? "bg-purple-600 hover:bg-purple-700 text-white"
+                  : "bg-gray-600 cursor-not-allowed text-gray-400"
               }`}
             >
-              {cpu.name} - ${cpu.price}
+              {added ? "✅ Ajouté !" : "Ajouter au panier"}
             </button>
-          ))}
+          </div>
         </div>
-
-        {/* GPU */}
-        <div className="bg-gray-900 rounded-3xl p-6 shadow-lg hover:shadow-purple-500/50 transition-shadow">
-          <h2 className="text-2xl font-bold mb-4">GPU</h2>
-          {gpuOptions.map((gpu) => (
-            <button
-              key={gpu.name}
-              onClick={() => setSelectedGPU(gpu)}
-              className={`w-full text-left p-3 rounded-xl mb-2 transition-colors ${
-                selectedGPU.name === gpu.name
-                  ? "bg-purple-500 text-black font-semibold"
-                  : "bg-gray-800 hover:bg-gray-700"
-              }`}
-            >
-              {gpu.name} - ${gpu.price}
-            </button>
-          ))}
-        </div>
-
-        {/* RAM */}
-        <div className="bg-gray-900 rounded-3xl p-6 shadow-lg hover:shadow-green-500/50 transition-shadow">
-          <h2 className="text-2xl font-bold mb-4">RAM</h2>
-          {ramOptions.map((ram) => (
-            <button
-              key={ram.name}
-              onClick={() => setSelectedRAM(ram)}
-              className={`w-full text-left p-3 rounded-xl mb-2 transition-colors ${
-                selectedRAM.name === ram.name
-                  ? "bg-green-500 text-black font-semibold"
-                  : "bg-gray-800 hover:bg-gray-700"
-              }`}
-            >
-              {ram.name} - ${ram.price}
-            </button>
-          ))}
-        </div>
-
-        {/* Storage */}
-        <div className="bg-gray-900 rounded-3xl p-6 shadow-lg hover:shadow-yellow-500/50 transition-shadow">
-          <h2 className="text-2xl font-bold mb-4">Storage</h2>
-          {storageOptions.map((storage) => (
-            <button
-              key={storage.name}
-              onClick={() => setSelectedStorage(storage)}
-              className={`w-full text-left p-3 rounded-xl mb-2 transition-colors ${
-                selectedStorage.name === storage.name
-                  ? "bg-yellow-500 text-black font-semibold"
-                  : "bg-gray-800 hover:bg-gray-700"
-              }`}
-            >
-              {storage.name} - ${storage.price}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Summary */}
-      <div className="max-w-3xl mx-auto mt-12 bg-gray-900 rounded-3xl p-6 text-center shadow-lg">
-        <h2 className="text-2xl font-bold mb-4">Summary</h2>
-        <p className="mb-4">
-          <span className="font-semibold">Model:</span> {selectedModel.name}
-        </p>
-        <p className="mb-4">
-          <span className="font-semibold">CPU:</span> {selectedCPU.name} (${selectedCPU.price})
-        </p>
-        <p className="mb-4">
-          <span className="font-semibold">GPU:</span> {selectedGPU.name} (${selectedGPU.price})
-        </p>
-        <p className="mb-4">
-          <span className="font-semibold">RAM:</span> {selectedRAM.name} (${selectedRAM.price})
-        </p>
-        <p className="mb-6">
-          <span className="font-semibold">Storage:</span> {selectedStorage.name} (${selectedStorage.price})
-        </p>
-        <p className="text-3xl font-bold mb-6">Total: ${totalPrice}</p>
-        <button className="px-8 py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-bold rounded-xl shadow-md transition-all duration-300">
-          Add to Cart
-        </button>
       </div>
     </div>
   );
