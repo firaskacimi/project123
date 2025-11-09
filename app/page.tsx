@@ -49,13 +49,16 @@ const Index = () => {
             </span>
           </h1>
 
-          <p className="text-gray-300 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed overflow-wrap-wrap-anywhere">
+          <p className="text-gray-300 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
             Trouvez tout l’équipement dont vous avez besoin pour améliorer votre
             setup : ordinateurs, périphériques, accessoires gaming et plus encore.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
-            <button className="bg-cyan-400 text-black font-semibold text-lg px-8 py-4 rounded-xl shadow-lg shadow-cyan-500/30 hover:bg-cyan-300 hover:shadow-cyan-500/50 transition duration-300">
+            <button
+              onClick={() => router.push("/products")}
+              className="bg-cyan-400 text-black font-semibold text-lg px-8 py-4 rounded-xl shadow-lg shadow-cyan-500/30 hover:bg-cyan-300 hover:shadow-cyan-500/50 transition duration-300"
+            >
               SHOP NOW
             </button>
             <button className="border border-purple-400 text-purple-400 hover:bg-purple-600/80 hover:text-white font-semibold text-lg px-8 py-4 rounded-xl shadow-lg shadow-purple-500/20 transition duration-300">
@@ -87,7 +90,7 @@ const Index = () => {
             {categories.map((item) => (
               <div
                 key={item.id}
-                onClick={() => router.push(`/products/${item.id}`)}
+                onClick={() => router.push(`/products?category=${item.id}`)}
                 className="group relative cursor-pointer rounded-2xl overflow-hidden border border-zinc-700 bg-zinc-900 hover:border-purple-500 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(168,85,247,0.3)]"
               >
                 <div className="aspect-4/3 overflow-hidden">
@@ -109,7 +112,7 @@ const Index = () => {
       </section>
 
       {/* Pourquoi acheter chez nous */}
-      <section className="py-24 px-6 md:px-12 text-centerrelative">
+      <section className="py-24 px-6 md:px-12 text-center relative">
         <div className="max-w-5xl mx-auto relative z-10">
           <h2 className="text-4xl md:text-5xl font-bold mb-16 bg-linear-to-r from-cyan-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
             Pourquoi acheter chez nous ?

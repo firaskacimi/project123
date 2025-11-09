@@ -61,7 +61,7 @@ export default function ProductsPage() {
   const paginatedProducts = filteredProducts.slice(
     (currentPage - 1) * PRODUCTS_PER_PAGE,
     currentPage * PRODUCTS_PER_PAGE
-  );
+  );  
 
   // ✅ Conditional rendering comes after hooks
   if (isLoading)
