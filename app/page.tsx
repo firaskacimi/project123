@@ -2,9 +2,17 @@
 
 import TopVentes from "@/components/TopVentes";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const Index = () => {
   const router = useRouter();
+
+  const [fadeIn, setFadeIn] = useState(false);
+
+  useEffect(() => {
+    setFadeIn(true);
+  }, []);
+
 
   const topProducts = [
     { name: "Clavier RGB", img: "/keyboard.jpg" },
@@ -32,7 +40,9 @@ const Index = () => {
   ];
 
   return (
-    <main className="min-h-screen text-zinc-100 bg-linear-to-b from-zinc-950 via-zinc-900 to-zinc-950 selection:bg-cyan-400/30 selection:text-white">
+    <main  className={`min-h-screen text-zinc-100 bg-linear-to-b from-zinc-950 via-zinc-900 to-zinc-950 selection:bg-cyan-400/30 selection:text-white transition-all duration-1000 ${
+        fadeIn ? "opacity-100" : "opacity-0"
+      }`}>
       {/* Hero Section */}
       <section className="relative h-[90vh] flex flex-col items-center justify-center text-center overflow-hidden">
         <div

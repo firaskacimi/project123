@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Product {
   _id: string;
@@ -30,6 +30,11 @@ export default function ProductDetails() {
   const pathname = usePathname();
   const productId = pathname.split("/").pop();
   const [added, setAdded] = useState(false);
+  const [fadeIn, setFadeIn] = useState(false);
+
+  useEffect(() => {
+    setFadeIn(true);
+  }, []);
 
   const { data, error, isLoading, isError } = useQuery({
     queryKey: ["products"],
@@ -38,7 +43,9 @@ export default function ProductDetails() {
 
   if (isLoading)
     return (
-      <div className="flex items-center justify-center h-screen text-white text-2xl">
+      <div  className={`flex items-center justify-center h-screen text-white text-2xl transition-all duration-2500 ${
+        fadeIn ? "opacity-100" : "opacity-0"
+      }`}>
         Chargement des produits...
       </div>
     );
@@ -82,7 +89,9 @@ export default function ProductDetails() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0e17] text-white pt-24 px-6 md:px-12">
+    <div  className={`min-h-screen bg-[#0b0e17] text-white pt-24 px-6 md:px-12 transition-all duration-2000 ${
+        fadeIn ? "opacity-100" : "opacity-0"
+      }`}>
       <div className="max-w-5xl mx-auto bg-[#111827] rounded-2xl shadow-lg border border-cyan-800 p-8 flex flex-col md:flex-row gap-8">
         {/* Left: Image */}
         {product.image && (

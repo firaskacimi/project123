@@ -12,9 +12,17 @@ interface Product {
 }
 
 export default function CartPage() {
+
   const [cart, setCart] = useState<Product[]>([]);
   const [updating, setUpdating] = useState(false);
   const [suggestions, setSuggestions] = useState<Product[]>([]);
+
+  const [fadeIn, setFadeIn] = useState(false);
+
+  useEffect(() => {
+    setFadeIn(true);
+  }, []);
+
 
   // Load cart and suggestions
   useEffect(() => {
@@ -93,7 +101,9 @@ export default function CartPage() {
     );
 
   return (
-    <div className="min-h-screen py-20  text-white pt-24 px-6 md:px-12">
+    <div  className={`min-h-screen py-20  text-white pt-24 px-6 md:px-12  transition-all duration-2000 ${
+        fadeIn ? "opacity-100" : "opacity-0"
+      }`}>
       {/* Cart + Summary */}
       <div className="max-w-6xl mx-auto bg-[#111827] border border-cyan-800 rounded-2xl p-8 shadow-lg flex flex-col md:flex-row gap-8">
         {/* Left: Cart Items */}
