@@ -57,7 +57,10 @@ export default function RegisterPage() {
       window.dispatchEvent(new Event("userUpdated"));
 
       toast.success("Inscription réussie !");
-      router.push("/"); // redirect to home after registration
+      // Reload page after a brief delay to ensure localStorage is persisted and Redux store is hydrated
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 500);
     },
     onError: (err) => {
       toast.error(err.message || "Erreur lors de l'inscription");

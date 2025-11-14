@@ -1,39 +1,60 @@
 "use client";
 
 import { useEffect } from "react";
+import useCart from "../hooks/useCart";
 import { useUserOrders } from "../hooks/useOrders";
+import Link from "next/link";
 
 export default function OrdersPage() {
-  const userId = "672b3e20"; // Replace with logged-in user ID
-  const { data: orders, isLoading } = useUserOrders(userId);
+  const userRaw = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+  const user = userRaw ? JSON.parse(userRaw) : null;
 
-  useEffect(() => {
-    console.log(orders);
-  }, [orders]);
+  const { data: orders, isLoading } = useUserOrders(user?._id);
 
-  if (isLoading) return <p className="text-center">Loading orders...</p>;
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        <p>Please log in to view your orders.</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        <p>Loading orders...</p>
+      </div>
+    );
+  }
 
   return (
-    <section className="max-w-5xl mx-auto py-10">
-      <h1 className="text-3xl font-semibold mb-8 text-center">My Orders</h1>
+    <div className="min-h-screen p-6 bg-neutral-950 text-white">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-2xl font-bold mb-6">Order history</h1>
 
-      <div className="grid gap-6">
-        {orders?.map((order) => (
-          <div
-            key={order._id}
-            className="border rounded-xl p-5 shadow-md hover:shadow-lg transition"
-          >
-            <p className="text-sm text-gray-500">
-              Order ID: <span className="font-medium">{order._id}</span>
-            </p>
-            <p>Status: {order.status}</p>
-            <p>Payment: {order.paymentStatus}</p>
-            <p className="font-semibold">
-              Total: ${order.totalPrice?.toFixed(2)}
-            </p>
-          </div>
-        ))}
+        {(!orders || orders.length === 0) ? (
+          <p className="text-gray-400">You have no orders yet.</p>
+        ) : (
+          <ul className="space-y-4">
+            {orders.map((o: any) => (
+              <li key={o._id} className="bg-[#0b0e17] p-4 rounded border border-gray-800">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <div className="font-semibold">Order #{o._id}</div>
+                    <div className="text-sm text-gray-400">Placed: {new Date(o.createdAt).toLocaleString()}</div>
+                    <div className="text-sm">Status: <span className="font-semibold">{o.status}</span></div>
+                    <div className="text-sm text-gray-400">Total: {o.totalPrice} €</div>
+                  </div>
+                  <div>
+                    <Link href={`/orders/${o._id}`} className="bg-cyan-500 px-3 py-2 rounded text-black font-semibold">Details</Link>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-    </section>
+    </div>
   );
 }
+

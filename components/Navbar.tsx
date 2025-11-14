@@ -113,7 +113,7 @@ export default function Navbar() {
               onClick={(e) => { e.stopPropagation(); setShowUserMenu(!showUserMenu); }}
               className="flex items-center gap-2 font-semibold hover:text-cyan-400 transition"
             >
-              {user.firstName || "User"}
+              {user.firstName}
             </button>
             {showUserMenu && (
               <div className="absolute right-0 mt-3 w-48 bg-[#0b0e17] border border-cyan-700/50 rounded-xl shadow-lg z-50">

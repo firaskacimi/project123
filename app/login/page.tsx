@@ -56,6 +56,16 @@ export default function LoginPage() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.data));
       localStorage.setItem("cart", JSON.stringify(data.data.cart || []));
+      
+        // ensure axios helper has the token for protected requests
+        try {
+          // dynamic import to avoid server-side errors
+          const mod = require("@/app/lib/api");
+          if (mod && typeof mod.setAuthToken === "function") mod.setAuthToken(data.token);
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.warn("Could not set auth token on axios instance:", err);
+        }
 
       queryClient.setQueryData(["user"], data.data);
       queryClient.setQueryData(["cart"], data.data.cart || []);
@@ -64,7 +74,10 @@ export default function LoginPage() {
       window.dispatchEvent(new Event("userUpdated"));
 
       toast.success("Connexion réussie !");
-      router.push("/"); // redirect after login
+      // Reload page after a brief delay to ensure localStorage is persisted and Redux store is hydrated
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 500);
     },
     onError: (err) => {
       toast.error(err.message || "Échec de la connexion");

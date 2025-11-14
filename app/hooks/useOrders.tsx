@@ -1,28 +1,25 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/app/lib/api";
 
-import { Order } from "@/.next/types/order";
-import { api } from "../lib/api";
-
-
-// 🟢 Get all orders
+// 🟢 Get all orders (admin)
 export const useOrders = () => {
-  return useQuery<Order[]>({
+  return useQuery({
     queryKey: ["orders"],
     queryFn: async () => {
-      const { data } = await api.get("/api/orders");
+      const { data } = await api.get("/orders");
       return data.data;
     },
   });
 };
 
 // 🟢 Get orders for specific user
-export const useUserOrders = (userId: string) => {
-  return useQuery<Order[]>({
+export const useUserOrders = (userId?: string) => {
+  return useQuery({
     queryKey: ["orders", userId],
     queryFn: async () => {
-      const { data } = await api.get(`/api/orders/user/${userId}`);
+      const { data } = await api.get(`/orders/user/${userId}`);
       return data.data;
     },
     enabled: !!userId,
@@ -34,8 +31,8 @@ export const useCreateOrder = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (orderData: Order) => {
-      const { data } = await api.post("/api/orders", orderData);
+    mutationFn: async (orderData: any) => {
+      const { data } = await api.post("/orders", orderData);
       return data.data;
     },
     onSuccess: () => {
@@ -49,14 +46,8 @@ export const useUpdateOrderStatus = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      id,
-      status,
-    }: {
-      id: string;
-      status: "pending" | "processing" | "shipped" | "delivered";
-    }) => {
-      const { data } = await api.put(`/api/orders/${id}`, { status });
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const { data } = await api.put(`/orders/${id}`, { status });
       return data.data;
     },
     onSuccess: () => {

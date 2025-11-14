@@ -6,6 +6,7 @@ import Footer from "@/app/components/Footer";
 import QueryProvider from "@/app/components/QueryProvider";
 import { Toaster } from "sonner";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import ClientProviders from "@/app/components/ClientProviders";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -32,20 +33,18 @@ export default function RootLayout({
 {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <QueryProvider>
-          <Toaster position="top-center" />
-            <LoadingSpinner>
-          <div className="bg-[#030712]">
-          <Navbar/>
-        <div >{children}</div> 
-          <Footer/>
-          </div>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ClientProviders>
+          <LoadingSpinner>
+            <div className="bg-[#030712]">
+              <Navbar />
+              <main className="py-20 bg-[#030712]">{children}</main>
+              <Footer />
+            </div>
           </LoadingSpinner>
-        </QueryProvider>
+        </ClientProviders>
       </body>
     </html>
+
   );
 }

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 export default function Preloader() {
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black">
+    <div className="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-black">
       {/* Logo */}
       <img
         src="/LogoM.png"

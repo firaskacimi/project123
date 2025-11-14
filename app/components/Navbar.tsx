@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Menu from "./Menu";
+import { clearAuthToken, setAuthToken } from "@/app/lib/api";
 
 export default function Navbar() {
   const [cart, setCart] = useState<any[]>([]);
@@ -20,6 +21,12 @@ export default function Navbar() {
         console.error("Invalid user data in localStorage:", err);
         localStorage.removeItem("user");
       }
+    }
+
+    // ensure axios has the Authorization header set if token exists
+    const token = localStorage.getItem("token");
+    if (token) {
+      setAuthToken(token);
     }
 
     const loadCart = () => {
@@ -58,8 +65,9 @@ export default function Navbar() {
 
   // ✅ Logout function
   const handleLogout = () => {
+    // clear token from axios defaults and localStorage
+    clearAuthToken();
     localStorage.removeItem("user");
-    localStorage.removeItem("token");
     setUser(null);
     setShowUserMenu(false);
   };
