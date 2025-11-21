@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -26,8 +26,13 @@ export default function RegisterPage() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fadeIn, setFadeIn] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    setFadeIn(true);
+  }, []);
 
   const registerMutation = useMutation<RegisterResponse, Error, { firstName: string; lastName: string; email: string; password: string }>({
     mutationKey: ["register"],
@@ -55,6 +60,7 @@ export default function RegisterPage() {
       queryClient.setQueryData(["cart"], data.data.cart || []);
 
       window.dispatchEvent(new Event("userUpdated"));
+      window.dispatchEvent(new Event("cartUpdated"));
 
       toast.success("Inscription réussie !");
       // Reload page after a brief delay to ensure localStorage is persisted and Redux store is hydrated
@@ -73,7 +79,9 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-950 text-white px-4">
+    <div className={`min-h-screen flex items-center justify-center bg-neutral-950 text-white px-4 transition-all duration-1000 ${
+        fadeIn ? "opacity-100" : "opacity-0"
+      }`}>
       <div className="w-full max-w-md p-8 bg-neutral-900 rounded-2xl border border-gray-800">
         <h1 className="text-3xl font-bold text-center mb-6">Créer un compte</h1>
         <form onSubmit={handleSubmit} className="space-y-4">

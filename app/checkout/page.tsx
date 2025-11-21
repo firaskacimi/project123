@@ -29,7 +29,7 @@ export default function CheckoutPage() {
   const userRaw = typeof window !== "undefined" ? localStorage.getItem("user") : null;
   const user = userRaw ? JSON.parse(userRaw) : null;
 
-  const products = (cart || []).map((c: CartItem) => ({ productId: c.productId, quantity: c.quantity }));
+  const products = (cart || []).map((item: CartItem) => ({ productId: item._id, quantity: item.quantity }));
 
   const total = (cart || []).reduce((acc: number, i: CartItem) => acc + (i.price || 0) * i.quantity, 0);
 

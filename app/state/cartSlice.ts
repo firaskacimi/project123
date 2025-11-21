@@ -3,10 +3,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export type CartItem = {
-  productId: string;
-  name?: string;
+  _id: string;
+  name: string;
   price: number;
   quantity: number;
+  image?: string;
 };
 
 type CartState = {
@@ -25,14 +26,13 @@ const slice = createSlice({
       state.items = action.payload;
     },
     addItem(state, action: PayloadAction<CartItem>) {
-      const existing = state.items.find((i) => i.productId === action.payload.productId);
+      const existing = state.items.find((i) => i._id === action.payload._id);
       if (existing) {
         existing.quantity += action.payload.quantity;
         if (existing.quantity <= 0) {
-          state.items = state.items.filter((i) => i.productId !== existing.productId);
+          state.items = state.items.filter((i) => i._id !== existing._id);
         }
       } else {
-        // if payload.quantity can be negative, guard
         if (action.payload.quantity > 0) state.items.push(action.payload);
       }
       // persist
@@ -44,7 +44,7 @@ const slice = createSlice({
       }
     },
     removeItem(state, action: PayloadAction<string>) {
-      state.items = state.items.filter((i) => i.productId !== action.payload);
+      state.items = state.items.filter((i) => i._id !== action.payload);
       try {
         localStorage.setItem("cart", JSON.stringify(state.items));
         window.dispatchEvent(new Event("cartUpdated"));

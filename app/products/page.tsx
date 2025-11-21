@@ -80,10 +80,12 @@ export default function ProductsPage() {
   // --- Filtering Logic (Memoized) ---
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
-      // 1. Search Filter
+      // 1. Search Filter (safe checks)
+      const name = typeof product.name === "string" ? product.name : "";
+      const description = typeof product.description === "string" ? product.description : "";
       const matchesSearch =
-        product.name.toLowerCase().includes(search.toLowerCase()) ||
-        product.description.toLowerCase().includes(search.toLowerCase());
+        name.toLowerCase().includes(search.toLowerCase()) ||
+        description.toLowerCase().includes(search.toLowerCase());
 
       // 2. Price Filters
       const price = product.price || 0;

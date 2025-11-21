@@ -31,8 +31,13 @@ interface LoginResponse {
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fadeIn, setFadeIn] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    setFadeIn(true);
+  }, []);
 
   const loginMutation = useMutation<LoginResponse, Error, { email: string; password: string }>({
     mutationKey: ["login"],
@@ -55,21 +60,23 @@ export default function LoginPage() {
       // Store token and user consistently
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.data));
-      localStorage.setItem("cart", JSON.stringify(data.data.cart || []));
-      
-        // ensure axios helper has the token for protected requests
-        try {
-          // dynamic import to avoid server-side errors
-          const mod = require("@/app/lib/api");
-          if (mod && typeof mod.setAuthToken === "function") mod.setAuthToken(data.token);
-        } catch (err) {
-          // eslint-disable-next-line no-console
-          console.warn("Could not set auth token on axios instance:", err);
-        }
+      // Only overwrite cart if backend provides a non-empty cart
+      if (Array.isArray(data.data.cart) && data.data.cart.length > 0) {
+        localStorage.setItem("cart", JSON.stringify(data.data.cart));
+        queryClient.setQueryData(["cart"], data.data.cart);
+        window.dispatchEvent(new Event("cartUpdated"));
+      }
+      // ensure axios helper has the token for protected requests
+      try {
+        // dynamic import to avoid server-side errors
+        const mod = require("@/app/lib/api");
+        if (mod && typeof mod.setAuthToken === "function") mod.setAuthToken(data.token);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn("Could not set auth token on axios instance:", err);
+      }
 
       queryClient.setQueryData(["user"], data.data);
-      queryClient.setQueryData(["cart"], data.data.cart || []);
-
       // Notify other components (like Navbar)
       window.dispatchEvent(new Event("userUpdated"));
 
@@ -90,7 +97,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-950 text-white px-4">
+    <div className={`min-h-screen flex items-center justify-center bg-neutral-950 text-white px-4 transition-all duration-1000 ${
+        fadeIn ? "opacity-100" : "opacity-0"
+      }`}>
       <div className="w-full max-w-md p-8 bg-neutral-900 rounded-2xl border border-gray-800">
         <h1 className="text-3xl font-bold text-center mb-6">Se connecter</h1>
         <form onSubmit={handleSubmit} className="space-y-4">

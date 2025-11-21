@@ -28,7 +28,7 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen p-6 bg-neutral-950 text-white">
+    <div className="min-h-screen mt-50 p-6 bg-neutral-950 text-white">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">Order history</h1>
 

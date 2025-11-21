@@ -13,7 +13,6 @@ export default function Navbar() {
   // ✅ Load user and cart from localStorage safely
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-
     if (storedUser && storedUser !== "undefined") {
       try {
         setUser(JSON.parse(storedUser));
@@ -21,6 +20,8 @@ export default function Navbar() {
         console.error("Invalid user data in localStorage:", err);
         localStorage.removeItem("user");
       }
+    } else {
+      setUser(null);
     }
 
     // ensure axios has the Authorization header set if token exists
@@ -68,12 +69,15 @@ export default function Navbar() {
     // clear token from axios defaults and localStorage
     clearAuthToken();
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
     setUser(null);
     setShowUserMenu(false);
+    // Optionally reload page if you want UI to reset
+    window.location.href = "/";
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full h-20 flex items-center justify-between px-4 md:px-12 z-50 text-white backdrop-blur-md bg-black/30 border-b border-white/10">
+    <header className="fixed top-0 left-0 w-full h-20 flex  items-center justify-between px-4 md:px-12 z-50 text-white backdrop-blur-md bg-black/30 border-b border-white/10">
       {/* Left: Logo */}
       <div className="text-2xl font-bold tracking-wide">
         <Link href="/">
