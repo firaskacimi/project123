@@ -57,7 +57,7 @@ const Index = () => {
       <section className="relative h-[80vh] sm:h-[90vh] flex flex-col items-center justify-center text-center overflow-hidden px-4 sm:px-6 md:px-12">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-40"
-          style={{ backgroundImage: `url('/hero-gaming.png')` }}
+          style={{ backgroundImage: `url('https://res.cloudinary.com/dgwcqsnn6/image/upload/v1764020268/Configuration_futuriste_en_bleu_n%C3%A9on_ux12kt.png')` }}
         />
         <div className="absolute inset-0 bg-linear-to-b from-black/80 via-black/60 to-black/90 backdrop-saturate-150" />
         <div className="relative z-10 max-w-3xl sm:max-w-4xl space-y-6 animate-fade-in">
@@ -230,7 +230,7 @@ const Index = () => {
     {/* Left Image */}
     <div className="flex-1 flex justify-center lg:justify-start">
       <img
-        src="/why.webp" // Replace with your image
+        src="https://res.cloudinary.com/dgwcqsnn6/image/upload/v1764019965/020f458122d9f7a3cd5d0eba923d6962-confused-gamer-cartoon_vmqvey.webp" 
         alt="Why Us Illustration"
         className="w-48 sm:w-64 lg:w-72 object-contain"
       />
@@ -295,7 +295,7 @@ const Index = () => {
     {/* Image */}
     <div className="flex-1">
       <img
-        src="/Mention-bro.svg"
+        src="https://res.cloudinary.com/dgwcqsnn6/image/upload/v1764019907/Mention-bro_fmn8bq.svg"
         alt="Contact Us"
         className="w-full h-full object-cover rounded-3xl shadow-lg"
       />

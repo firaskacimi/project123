@@ -81,7 +81,7 @@ export default function Navbar() {
       {/* Left: Logo */}
       <div className="text-2xl font-bold tracking-wide">
         <Link href="/">
-          <img className="w-20 h-20" src="/LogoM.png" alt="Logo" />
+          <img className="w-20 h-20" src="https://res.cloudinary.com/dgwcqsnn6/image/upload/v1764020086/IMG_2204-removebg-preview_fnnae2.png" alt="Logo" />
         </Link>
       </div>
 

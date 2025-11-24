@@ -1,66 +1,70 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Cpu, HardDrive, Monitor, Zap, Settings } from "lucide-react";
+import { Zap } from "lucide-react";
 import useCart from "@/app/hooks/useCart";
 import axios from "axios";
 
-const CATEGORY_CONFIG = [
-  { category: "Processor", categoryId: "691a59cda0fe008fd919143e", icon: Cpu },
-  { category: "Graphics Card", categoryId: "690a3bcb26ebf05ce130b927", icon: Monitor },
-  { category: "Memory", categoryId: "691a59a9a0fe008fd9191432", icon: HardDrive },
-  { category: "Storage", categoryId: "691a59b0a0fe008fd9191435", icon: HardDrive },
-  { category: "Motherboard", categoryId: "691a59a3a0fe008fd919142f", icon: Cpu },
-  { category: "Cooling", categoryId: "691a59cda0fe008fd919143e", icon: Monitor },
-  { category: "Power Supply", categoryId: "691a59b5a0fe008fd9191438", icon: HardDrive },
-  { category: "PC Case", categoryId: "691a59c3a0fe008fd919143b", icon: HardDrive },
-];
-
-const CASE_PSU_PRICE = 200;
+type Category = {
+  _id: string;
+  name: string;
+};
 
 export default function PCCustomizer() {
   const { addToCart } = useCart();
-  const [dropdownOpen, setDropdownOpen] = useState(CATEGORY_CONFIG.map(() => false));
-  const [selections, setSelections] = useState<any[]>(CATEGORY_CONFIG.map(() => null));
-  const [productsByCategory, setProductsByCategory] = useState<any[][]>(CATEGORY_CONFIG.map(() => []));
+
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [productsByCategory, setProductsByCategory] = useState<any[][]>([]);
+  const [selections, setSelections] = useState<any[]>([]);
+  const [dropdownOpen, setDropdownOpen] = useState<boolean[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const CASE_PSU_PRICE = 200;
+
+  // Fetch categories
   useEffect(() => {
-    // Fetch all categories’ products
-    const fetchProducts = async () => {
+    const fetchCategories = async () => {
       try {
+        const res = await axios.get("http://localhost:4000/category");
+        const cats = res.data.data || [];
+        setCategories(cats);
+        setSelections(Array(cats.length).fill(null));
+        setDropdownOpen(Array(cats.length).fill(false));
+
+        // Fetch products for each category
         const allProducts = await Promise.all(
-          CATEGORY_CONFIG.map(async (cat) => {
-            const res = await axios.get(`http://localhost:4000/products?category=${cat.categoryId}`);
-            return res.data?.data || [];
+          cats.map(async (cat: Category) => {
+            const r = await axios.get(`http://localhost:4000/products?category=${cat._id}`);
+            return r.data?.data || [];
           })
         );
         setProductsByCategory(allProducts);
       } catch (err) {
-        console.error("Failed to fetch products:", err);
+        console.error("Failed to fetch categories or products:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProducts();
+    fetchCategories();
   }, []);
+
+  const handleToggleDropdown = (catIdx: number) => {
+    setDropdownOpen((prev) => prev.map((open, idx) => (idx === catIdx ? !open : false)));
+  };
 
   const handleSelectProduct = (catIdx: number, product: any) => {
     setSelections((prev) => prev.map((sel, idx) => (idx === catIdx ? product : sel)));
     setDropdownOpen((prev) => prev.map((open, idx) => (idx === catIdx ? false : open)));
   };
 
-  const handleToggleDropdown = (catIdx: number) => {
-    setDropdownOpen((prev) => prev.map((open, idx) => (idx === catIdx ? !open : false)));
-  };
-
   const totalPrice = selections.reduce((sum, p) => sum + (p?.price || 0), 0) + CASE_PSU_PRICE;
+
   const customPC = {
     _id: "custom-pc",
     name: "Custom Gaming PC",
     components: selections.map((prod, idx) => ({
-      category: CATEGORY_CONFIG[idx].category,
+      category: categories[idx]?.name,
       productId: prod?._id,
       name: prod?.name,
       price: prod?.price,
@@ -87,65 +91,66 @@ export default function PCCustomizer() {
         <div className="grid lg:grid-cols-3 gap-12">
           {/* Component Selection */}
           <div className="lg:col-span-2 space-y-6">
-            {CATEGORY_CONFIG.map((cat, catIdx) => {
-              const IconComponent = cat.icon;
-              const selected = selections[catIdx];
-              const products = productsByCategory[catIdx] || [];
+            {loading ? (
+              <p className="text-gray-400 text-center">Loading categories and products...</p>
+            ) : (
+              categories.map((cat, idx) => {
+                const selected = selections[idx];
+                const products = productsByCategory[idx] || [];
 
-              return (
-                <div key={cat.category} className="border border-gray-700 rounded-xl bg-gray-800 p-6 hover:shadow-lg transition-shadow">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-700">
-                        <IconComponent className="h-6 w-6 text-blue-400" />
-                      </div>
+                return (
+                  <div
+                    key={cat._id}
+                    className="border border-gray-700 rounded-xl bg-gray-800 p-6 hover:shadow-lg transition-shadow relative"
+                  >
+                    <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="font-semibold text-lg">{cat.category}</h4>
+                        <h4 className="font-semibold text-lg">{cat.name}</h4>
                         <p className="text-gray-400">{selected ? selected.name : "No selection"}</p>
                       </div>
+
+                      <div className="text-right">
+                        <div className="text-2xl font-bold">${selected?.price || 0}</div>
+                        <button
+                          className="mt-2 px-4 py-2 border border-gray-600 rounded hover:bg-gray-700 text-sm"
+                          onClick={() => handleToggleDropdown(idx)}
+                        >
+                          Change
+                        </button>
+                      </div>
                     </div>
 
-                    <div className="text-right relative">
-                      <div className="text-2xl font-bold">${selected?.price || 0}</div>
-                      <button
-                        className="mt-2 px-4 py-2 border border-gray-600 rounded hover:bg-gray-700 text-sm"
-                        onClick={() => handleToggleDropdown(catIdx)}
-                      >
-                        Change
-                      </button>
-
-                      {dropdownOpen[catIdx] && (
-                        <div className="absolute right-0 mt-2 w-64 bg-gray-800 border border-gray-700 rounded shadow-lg z-10">
-                          {loading ? (
-                            <div className="p-4 text-center text-gray-400">Loading...</div>
-                          ) : products.length === 0 ? (
-                            <div className="p-4 text-center text-gray-400">No products found.</div>
-                          ) : (
-                            <div className="max-h-64 overflow-y-auto">
-                              {products.map((prod: any) => (
-                                <button
-                                  key={prod._id}
-                                  className={`flex items-center w-full text-left px-4 py-2 hover:bg-gray-700 ${
-                                    selected?._id === prod._id ? "bg-gray-700 font-bold" : ""
-                                  }`}
-                                  onClick={() => handleSelectProduct(catIdx, prod)}
-                                >
-                                  {prod.image && (
-                                    <img src={prod.image} alt={prod.name} className="w-10 h-10 object-cover rounded mr-2" />
-                                  )}
-                                  <span className="flex-1">{prod.name}</span>
-                                  <span className="font-medium">${prod.price}</span>
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
+                    {dropdownOpen[idx] && (
+                      <div className="absolute right-0 top-full mt-2 w-64 bg-gray-800 border border-gray-700 rounded shadow-lg z-10 max-h-64 overflow-y-auto">
+                        {products.length === 0 ? (
+                          <div className="p-4 text-center text-gray-400">No products found.</div>
+                        ) : (
+                          products.map((prod: any) => (
+                            <button
+                              key={prod._id}
+                              className={`flex items-center w-full text-left px-4 py-2 hover:bg-gray-700 ${
+                                selected?._id === prod._id ? "bg-gray-700 font-bold" : ""
+                              }`}
+                              onClick={() => handleSelectProduct(idx, prod)}
+                            >
+                              {prod.image && (
+                                <img
+                                  src={prod.image}
+                                  alt={prod.name}
+                                  className="w-10 h-10 object-cover rounded mr-2"
+                                />
+                              )}
+                              <span className="flex-1">{prod.name}</span>
+                              <span className="font-medium">${prod.price}</span>
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    )}
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
 
           {/* Build Summary */}
@@ -157,9 +162,9 @@ export default function PCCustomizer() {
               </h3>
 
               <div className="space-y-4 mb-6">
-                {CATEGORY_CONFIG.map((cat, idx) => (
-                  <div key={cat.category} className="flex justify-between text-sm">
-                    <span className="text-gray-400">{cat.category}</span>
+                {categories.map((cat, idx) => (
+                  <div key={cat._id} className="flex justify-between text-sm">
+                    <span className="text-gray-400">{cat.name}</span>
                     <span className="font-medium">${selections[idx]?.price || 0}</span>
                   </div>
                 ))}
