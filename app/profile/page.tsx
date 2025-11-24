@@ -172,7 +172,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen py-25 p-6 flex items-start justify-center bg-neutral-950 text-white">
+    <div className="min-h-screen py-25 p-6 flex items-start justify-center  text-white">
       <div className="w-full max-w-2xl bg-[#0b0e17] rounded-xl p-8 border border-gray-800">
         <h1 className="text-3xl font-bold mb-8">Mon Profil</h1>
 

@@ -15,6 +15,8 @@ interface Product {
   image?: string;
 }
 
+
+
 async function fetchProducts(): Promise<Product[]> {
   const res = await fetch("http://localhost:4000/products");
   const data = await res.json();
@@ -43,7 +45,7 @@ export default function ProductDetails() {
 
   if (isLoading)
     return (
-      <div  className={`flex items-center justify-center h-screen text-white text-2xl transition-all duration-2500 ${
+      <div  className={`flex items-center justify-center h-screen text-white text-2xl transition-all duration-1000 ${
         fadeIn ? "opacity-100" : "opacity-0"
       }`}>
         Chargement des produits...
@@ -156,6 +158,44 @@ export default function ProductDetails() {
           </div>
         </div>
       </div>
+      {/* Suggested Products Section */}
+{data && (
+  <section className="py-16 px-6 md:px-12">
+    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-linear-to-r from-cyan-400 via-purple-500 to-fuchsia-500 text-center mb-12">
+      Suggested Products
+    </h2>
+
+    <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {data
+        .filter((p) => p._id !== productId) // exclude current product
+        .slice(0, 4) // show up to 4 suggested products
+        .map((item) => (
+          <Link
+            key={item._id}
+            href={`/products/${item._id}`}
+            className="bg-zinc-800 rounded-xl overflow-hidden shadow-lg hover:shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all duration-300 flex flex-col"
+          >
+            {item.image && (
+              <div className="aspect-square w-full overflow-hidden">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+            )}
+            <div className="p-4 flex-1 flex flex-col justify-between">
+              <h3 className="text-lg font-semibold text-purple-400 mb-2">
+                {item.name}
+              </h3>
+              <span className="text-cyan-400 font-bold">{item.price} €</span>
+            </div>
+          </Link>
+        ))}
+    </div>
+  </section>
+)}
+
     </div>
   );
 }

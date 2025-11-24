@@ -95,46 +95,7 @@ export default function Navbar() {
       </nav>
 
       {/* Right Side: Login / User + Cart */}
-      <div className="hidden md:flex items-center gap-6 relative">
-        {/* 👤 User Section */}
-        {!user ? (
-          <Link
-            href="/login"
-            className="bg-cyan-500/90 px-4 py-1.5 rounded-md hover:bg-cyan-400 transition text-sm font-semibold text-black"
-          >
-            LOG IN
-          </Link>
-        ) : (
-          <div className="relative" id="user-menu">
-            <button
-              onClick={() => setShowUserMenu(!showUserMenu)}
-              className="flex items-center gap-2 font-semibold hover:text-cyan-400 transition"
-            >
-               {user.name || "User"}
-            </button>
-
-            {showUserMenu && (
-              <div className="absolute right-0 mt-3 w-48 bg-[#0b0e17] border border-cyan-700/50 rounded-xl shadow-lg z-50">
-                <Link href="/profile" className="block px-4 py-2 hover:bg-cyan-500/10">
-                  Profile
-                </Link>
-                <Link href="/cart" className="block px-4 py-2 hover:bg-cyan-500/10">
-                  Cart
-                </Link>
-                <Link href="/orders" className="block px-4 py-2 hover:bg-cyan-500/10">
-                  History
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="w-full text-left px-4 py-2 text-red-400 hover:bg-red-500/10"
-                >
-                  Logout
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
+      <div className="hidden md:flex items-center gap-20 relative">
         {/* 🛒 Mini Cart */}
         <div
           className="relative cursor-pointer hover:text-cyan-400 transition"
@@ -188,6 +149,44 @@ export default function Navbar() {
             </div>
           )}
         </div>
+         {/* 👤 User Section */}
+        {!user ? (
+          <Link
+            href="/login"
+            className="bg-cyan-500/90 px-4 py-1.5 rounded-md hover:bg-cyan-400 transition text-sm font-semibold text-black"
+          >
+            LOG IN
+          </Link>
+        ) : (
+          <div className="relative " id="user-menu">
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="flex items-center gap-2 font-semibold hover:text-cyan-400 transition"
+            >
+               {user.firstName || "User"}
+            </button>
+
+            {showUserMenu && (
+              <div className="absolute right-0 mt-3 w-48 bg-[#0b0e17] border border-cyan-700/50 rounded-xl shadow-lg z-50">
+                <Link href="/profile" className="block px-4 py-2 hover:bg-cyan-500/10">
+                  Profile
+                </Link>
+                <Link href="/cart" className="block px-4 py-2 hover:bg-cyan-500/10">
+                  Cart
+                </Link>
+                <Link href="/orders" className="block px-4 py-2 hover:bg-cyan-500/10">
+                  History
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-2 text-red-400 hover:bg-red-500/10"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Mobile Menu */}

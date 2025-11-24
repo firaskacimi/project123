@@ -39,7 +39,7 @@ export default function ContactUsPage() {
 
   return (
     <div
-      className={`min-h-screen py-50 text-white p-8 flex flex-col items-center transition-all duration-1000 ${
+      className={`min-h-screen py-20 text-white p-8 flex flex-col items-center transition-all duration-1000 ${
         fadeIn ? "opacity-100" : "opacity-0"
       }`}
     >

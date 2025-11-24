@@ -29,8 +29,8 @@ export default function OrderDetail({ params }: { params: { id: string } }) {
   if (!order) return <div className="p-6 text-white">Order not found</div>;
 
   return (
-    <div className="min-h-screen p-6 bg-neutral-950 text-white">
-      <div className="max-w-3xl mx-auto bg-[#0b0e17] p-6 rounded border border-gray-800">
+    <div className="min-h-screen p-6  text-white">
+      <div className="max-w-3xl mx-auto  p-6 rounded border border-gray-800">
         <h1 className="text-xl font-bold mb-3">Order #{order._id}</h1>
         <div className="text-sm text-gray-400 mb-2">Status: <span className="font-semibold">{order.status}</span></div>
         <div className="mb-4">Payment status: <span className="font-semibold">{order.paymentStatus}</span></div>
