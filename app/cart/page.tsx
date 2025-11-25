@@ -4,51 +4,23 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import useCart from "../hooks/useCart";
 import type { CartItem } from "@/app/state/cartSlice";
-
-interface SuggestionProduct {
-  _id: string;
-  name: string;
-  price: number;
-  image?: string;
-}
+import SuggestedProducts from "@/app/components/SuggestedProducts";
 
 export default function CartPage() {
   const { cart, addToCart, removeFromCart, clearCart } = useCart();
-
   const [fadeIn, setFadeIn] = useState(false);
-  const [suggestions, setSuggestions] = useState<SuggestionProduct[]>([]);
 
-  useEffect(() => {
-    setFadeIn(true);
-  }, []);
-
-  // Fetch suggestions
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await fetch("http://localhost:4000/products");
-        const data = await res.json();
-
-        if (res.ok && data.success) {
-          const filtered = data.data.filter(
-            (p: SuggestionProduct) => !cart.some((c) => c.productId === p._id)
-          );
-
-          const shuffled = filtered.sort(() => 0.5 - Math.random());
-          setSuggestions(shuffled.slice(0, 4));
-        }
-      } catch (err) {
-        console.error("Error fetching suggestions:", err);
-      }
-    };
-
-    fetchProducts();
-  }, [cart]);
+  useEffect(() => setFadeIn(true), []);
 
   const total = (cart || []).reduce(
     (sum, item) => sum + (item.price || 0) * item.quantity,
     0
   );
+
+  // Use removeFromCart from useCart
+  const handleRemove = (productId: string) => {
+    removeFromCart(productId);
+  };
 
   if (!cart || cart.length === 0)
     return (
@@ -113,13 +85,6 @@ export default function CartPage() {
                   >
                     +
                   </button>
-
-                  <button
-                    onClick={() => removeFromCart(item.productId)}
-                    className="ml-4 text-red-400 hover:text-red-500 transition"
-                  >
-                    Supprimer
-                  </button>
                 </div>
               </div>
             </div>
@@ -158,35 +123,10 @@ export default function CartPage() {
       </div>
 
       {/* SUGGESTIONS */}
-      {suggestions.length > 0 && (
-        <div className="max-w-6xl mx-auto mt-12">
-          <h2 className="text-2xl font-bold text-cyan-400 mb-6">
-            Vous pourriez aussi aimer
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            {suggestions.map((item) => (
-              <Link
-                key={item._id}
-                href={`/products/${item._id}`}
-                className="bg-[#111827] border border-cyan-800 rounded-xl p-4 flex flex-col items-center gap-3 hover:shadow-lg hover:scale-105 transition-transform"
-              >
-                {item.image && (
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-40 object-cover rounded-lg"
-                  />
-                )}
-                <h3 className="text-lg font-semibold text-purple-400 text-center">
-                  {item.name}
-                </h3>
-                <p className="text-gray-300">{item.price} €</p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
+      <SuggestedProducts
+        excludeIds={cart.map((item) => item.productId)}
+        limit={4}
+      />
     </div>
   );
 }

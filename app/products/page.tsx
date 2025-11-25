@@ -1,13 +1,13 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import SearchBar from "@/app/components/SearchBar";
 import Pagination from "@/app/components/Pagination";
 import ProductFilters from "../components/ProductFilter";
 import { isPaginatedResponse, PaginationMeta, Product } from "../utils/types";
+import ProductCard from "../components/ProductCrad";
 
 // --- Data Fetching Function ---
 async function fetchProducts(
@@ -40,12 +40,12 @@ export default function ProductsPage() {
   const searchParams = useSearchParams();
 
   // Get query parameters
-  const search = searchParams.get("search") || "";
-  const minPrice = searchParams.get("minPrice") || "";
-  const maxPrice = searchParams.get("maxPrice") || "";
-  const category = searchParams.get("category") || "";
-  const page = parseInt(searchParams.get("page") || "1");
-  const limit = parseInt(searchParams.get("limit") || "12");
+  const search = searchParams?.get("search") || "";
+  const minPrice = searchParams?.get("minPrice") || "";
+  const maxPrice = searchParams?.get("maxPrice") || "";
+  const category = searchParams?.get("category") || "";
+  const page = parseInt(searchParams?.get("page") || "1");
+  const limit = parseInt(searchParams?.get("limit") || "12");
 
   // Build query params for API call
   const queryParams = new URLSearchParams();
@@ -69,7 +69,6 @@ export default function ProductsPage() {
   const [fadeIn, setFadeIn] = useState(false);
 
   useEffect(() => {
-    // Trigger fade-in animation when component mounts
     const timer = setTimeout(() => setFadeIn(true), 0);
     return () => clearTimeout(timer);
   }, []);
@@ -77,14 +76,13 @@ export default function ProductsPage() {
   const products = data?.products || [];
   const pagination = data?.pagination;
 
-  // --- Loading and Error States ---
   if (isLoading) return <div>Loading...</div>;
 
   if (isError)
     return (
       <div className="flex items-center justify-center h-screen text-red-400 text-2xl">
         <div className="text-center">
-          <p className="mb-2">Erreur : {(error as Error).message}</p>
+          <p className="mb-2">Erreur : {error.message}</p>
           <button
             onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors"
@@ -95,10 +93,9 @@ export default function ProductsPage() {
       </div>
     );
 
-  // --- Render ---
   return (
     <div
-      className={`min-h-screen  text-white pt-24 px-6 py-50 md:px-12 transition-all duration-1000 ${
+      className={`min-h-screen text-white pt-24 px-6 py-50 md:px-12 transition-all duration-1000 ${
         fadeIn ? "opacity-100" : "opacity-0"
       }`}
     >
@@ -114,12 +111,10 @@ export default function ProductsPage() {
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
-          {/* Search Bar */}
           <div className="mb-6">
             <SearchBar />
           </div>
 
-          {/* Product Grid */}
           {products.length === 0 ? (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
@@ -136,46 +131,24 @@ export default function ProductsPage() {
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {products.map((product: Product) => (
-                  <Link
-                    href={`/products/${product._id}`}
-                    key={product._id}
-                    className="bg-[#111827] rounded-2xl shadow-lg border border-cyan-800 hover:border-purple-600 hover:shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all duration-300 p-6 flex flex-col"
-                  >
-                    {product.image && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-48 object-cover rounded-xl mb-4"
-                      />
-                    )}
-                    <h2 className="text-2xl font-semibold mb-3 text-cyan-400">
-                      {product.name}
-                    </h2>
-                    <p className="text-gray-300 mb-4 grow">
-                      {product.description || "Aucune description disponible."}
-                    </p>
+                {products.map((product: Product) => {
+                  const normalizedId =
+                    typeof product._id === "string"
+                      ? product._id
+                      : product._id?.$oid || String(product._id);
 
-                    <div className="flex items-center justify-between mt-auto">
-                      <span className="text-lg font-bold text-purple-400">
-                        {product.price} €
-                      </span>
-                      <span
-                        className={`text-sm px-3 py-1 rounded-full ${
-                          product.stockQuantity > 0
-                            ? "bg-green-600/30 text-green-400"
-                            : "bg-red-600/30 text-red-400"
-                        }`}
-                      >
-                        {product.stockQuantity > 0 ? "En stock" : "Rupture"}
-                      </span>
-                    </div>
-                  </Link>
-                ))}
+                  return (
+                    <ProductCard
+                      key={normalizedId}
+                      _id={normalizedId}
+                      name={product.name}
+                      price={product.price}
+                      image={product.image}
+                    />
+                  );
+                })}
               </div>
 
-              {/* Pagination */}
               {pagination && (
                 <Pagination
                   totalPages={pagination.totalPages}
