@@ -36,19 +36,27 @@ export default function OrdersPage() {
     );
   }
 
+  // ✅ Sort by newest first
+  const sortedOrders = orders
+    ? [...orders].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )
+    : [];
+
   return (
     <div className="min-h-screen mt-12 p-6 text-white">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">Order History</h1>
 
-        {(!orders || orders.length === 0) ? (
+        {sortedOrders.length === 0 ? (
           <p className="text-gray-400">You have no orders yet.</p>
         ) : (
           <ul className="space-y-4">
-            {orders.map((o: any) => (
+            {sortedOrders.map((o: any) => (
               <li key={o._id} className="bg-[#0b0e17] p-4 rounded border border-gray-800">
                 <div className="flex justify-between items-center">
                   <div className="space-y-1">
+
                     {/* ID and Status badge inline */}
                     <div className="flex items-center gap-2 font-semibold">
                       <span>Order #{o._id}</span>
@@ -103,8 +111,13 @@ export default function OrdersPage() {
                 <div className="mb-6">
                   <h3 className="font-semibold mb-2">Shipping Info</h3>
                   <p><span className="font-semibold">Name:</span> {openOrder.shipping.fullName}</p>
-                  <p><span className="font-semibold">Address:</span> {openOrder.shipping.address}, {openOrder.shipping.city}, {openOrder.shipping.country}</p>
-                  {openOrder.shipping.postalCode && <p><span className="font-semibold">Postal Code:</span> {openOrder.shipping.postalCode}</p>}
+                  <p>
+                    <span className="font-semibold">Address:</span> 
+                    {openOrder.shipping.address}, {openOrder.shipping.city}, {openOrder.shipping.country}
+                  </p>
+                  {openOrder.shipping.postalCode && (
+                    <p><span className="font-semibold">Postal Code:</span> {openOrder.shipping.postalCode}</p>
+                  )}
                   <p><span className="font-semibold">Phone:</span> {openOrder.shipping.phone}</p>
                   <p><span className="font-semibold">Total:</span> {openOrder.totalPrice} €</p>
                   <p className="text-sm mt-2">
@@ -118,18 +131,33 @@ export default function OrdersPage() {
                 <h3 className="font-semibold mb-2">Products</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {openOrder.products.map((item: any, idx: number) => (
-                    <div key={idx} className="bg-gray-800 p-3 rounded-lg flex flex-col items-center shadow hover:shadow-lg transition transform hover:scale-105">
+                    <div
+                      key={idx}
+                      className="bg-gray-800 p-3 rounded-lg flex flex-col items-center shadow hover:shadow-lg transition transform hover:scale-105"
+                    >
                       {item.product?.image ? (
-                        <img src={item.product.image} alt={item.product.name} className="w-24 h-24 object-cover rounded mb-2" />
+                        <img
+                          src={item.product.image}
+                          alt={item.product.name}
+                          className="w-24 h-24 object-cover rounded mb-2"
+                        />
                       ) : (
                         <div className="w-24 h-24 bg-gray-700 flex items-center justify-center rounded mb-2 text-gray-400 text-xs">
                           No Image
                         </div>
                       )}
-                      <span className="text-sm font-semibold text-center">{item.product?.name || "Unnamed"}</span>
+
+                      <span className="text-sm font-semibold text-center">
+                        {item.product?.name || "Unnamed"}
+                      </span>
                       <span className="text-gray-400 text-xs">Qty: {item.quantity}</span>
+
                       {item.product?.stockQuantity !== undefined && (
-                        <span className={`text-xs mt-1 ${item.product.stockQuantity <= 5 ? "text-red-500" : "text-gray-400"}`}>
+                        <span
+                          className={`text-xs mt-1 ${
+                            item.product.stockQuantity <= 5 ? "text-red-500" : "text-gray-400"
+                          }`}
+                        >
                           Stock: {item.product.stockQuantity}
                         </span>
                       )}

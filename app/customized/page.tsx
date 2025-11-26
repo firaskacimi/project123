@@ -21,7 +21,7 @@ export default function PCCustomizer() {
 
   const CASE_PSU_PRICE = 200;
 
-  // Fetch categories
+  // Fetch categories and products
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -31,7 +31,6 @@ export default function PCCustomizer() {
         setSelections(Array(cats.length).fill(null));
         setDropdownOpen(Array(cats.length).fill(false));
 
-        // Fetch products for each category
         const allProducts = await Promise.all(
           cats.map(async (cat: Category) => {
             const r = await axios.get(`http://localhost:4000/products?category=${cat._id}`);
@@ -45,7 +44,6 @@ export default function PCCustomizer() {
         setLoading(false);
       }
     };
-
     fetchCategories();
   }, []);
 
@@ -55,6 +53,7 @@ export default function PCCustomizer() {
 
   const handleSelectProduct = (catIdx: number, product: any) => {
     setSelections((prev) => prev.map((sel, idx) => (idx === catIdx ? product : sel)));
+    // Close dropdown immediately after selection
     setDropdownOpen((prev) => prev.map((open, idx) => (idx === catIdx ? false : open)));
   };
 
@@ -64,13 +63,22 @@ export default function PCCustomizer() {
     _id: "custom-pc",
     name: "Custom Gaming PC",
     components: selections.map((prod, idx) => ({
-      category: categories[idx]?.name,
-      productId: prod?._id,
-      name: prod?.name,
-      price: prod?.price,
+      category: categories[idx]?.name || "Unknown",
+      productId: prod?._id || "none",
+      name: prod?.name || "None selected",
+      price: prod?.price || 0,
     })),
     price: totalPrice,
     quantity: 1,
+  };
+
+  const handleAddToCart = () => {
+    if (selections.some((sel) => !sel)) {
+      alert("Please select a product for all categories before adding to cart!");
+      return;
+    }
+    addToCart(customPC);
+    alert("Custom PC added to cart!");
   };
 
   return (
@@ -97,7 +105,6 @@ export default function PCCustomizer() {
               categories.map((cat, idx) => {
                 const selected = selections[idx];
                 const products = productsByCategory[idx] || [];
-
                 return (
                   <div
                     key={cat._id}
@@ -108,7 +115,6 @@ export default function PCCustomizer() {
                         <h4 className="font-semibold text-lg">{cat.name}</h4>
                         <p className="text-gray-400">{selected ? selected.name : "No selection"}</p>
                       </div>
-
                       <div className="text-right">
                         <div className="text-2xl font-bold">${selected?.price || 0}</div>
                         <button
@@ -182,7 +188,7 @@ export default function PCCustomizer() {
               <div className="space-y-3">
                 <button
                   className="w-full px-4 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:opacity-50"
-                  onClick={() => addToCart(customPC)}
+                  onClick={handleAddToCart}
                   disabled={loading || selections.some((sel) => !sel)}
                 >
                   Add to Cart

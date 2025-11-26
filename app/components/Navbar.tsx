@@ -175,7 +175,7 @@ export default function Navbar() {
                   Cart
                 </Link>
                 <Link href="/orders" className="block px-4 py-2 hover:bg-cyan-500/10">
-                  History
+                  Orders
                 </Link>
                 <button
                   onClick={handleLogout}
