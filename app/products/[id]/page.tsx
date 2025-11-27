@@ -16,6 +16,7 @@ export default function ProductDetails() {
 
   useEffect(() => setFadeIn(true), []);
 
+  // Fetch product
   const { data: product, error, isLoading, isError } = useQuery<Product, Error>({
     queryKey: ["product", productId],
     queryFn: async () => {
@@ -30,20 +31,17 @@ export default function ProductDetails() {
       return data.data;
     },
     enabled: !!productId,
-    staleTime: 1000 * 60,
+    staleTime: 1000 * 60, // 1 minute
   });
 
+  // Add to cart
   const addToCart = () => {
     if (!product) return;
 
-    const normalizedId =
-      typeof product._id === "string" ? product._id : product._id?.$oid || String(product._id);
+    const normalizedId = product._id;
 
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const existing = cart.find((item: any) => {
-      const idA = typeof item._id === "string" ? item._id : item._id?.$oid || String(item._id);
-      return idA === normalizedId;
-    });
+    const existing = cart.find((item: any) => item._id === normalizedId);
 
     if (existing) existing.quantity += 1;
     else cart.push({ ...product, _id: normalizedId, quantity: 1 });
@@ -54,6 +52,7 @@ export default function ProductDetails() {
     setTimeout(() => setAdded(false), 1500);
   };
 
+  // Loading state
   if (isLoading)
     return (
       <div
@@ -65,6 +64,7 @@ export default function ProductDetails() {
       </div>
     );
 
+  // Error state
   if (isError)
     return (
       <div className="flex items-center justify-center h-screen text-red-400 text-2xl">
@@ -72,6 +72,7 @@ export default function ProductDetails() {
       </div>
     );
 
+  // Product not found
   if (!product)
     return (
       <div className="flex flex-col items-center justify-center h-screen text-gray-400 text-2xl">
@@ -95,7 +96,7 @@ export default function ProductDetails() {
       <ProductDetailsCard
         name={product.name!}
         description={product.description}
-        details={product.details}
+        {...("details" in product ? { details: (product as any).details } : {})}
         price={product.price!}
         stockQuantity={product.stockQuantity ?? 0}
         image={product.image}
@@ -103,12 +104,12 @@ export default function ProductDetails() {
         added={added}
       />
 
-      {/* SUGGESTIONS */}
+      {/* Suggested Products */}
       <SuggestedProducts
         excludeIds={(() => {
           try {
             const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-            return Array.isArray(cart) ? cart.map((item: any) => item.productId || item._id) : [];
+            return Array.isArray(cart) ? cart.map((item: any) => item._id) : [];
           } catch {
             return [];
           }

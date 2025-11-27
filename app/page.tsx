@@ -40,12 +40,26 @@ const Index = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  const topProducts = [
-    { name: "Clavier RGB", img: "/keyboard.jpg" },
-    { name: "Souris gaming", img: "/mouse.jpg" },
-    { name: "Accessoires PC", img: "/accessories.jpg" },
-    { name: "Chargeur portable", img: "/charger.jpg" },
-  ];
+
+  // Fetch all products from backend
+  const fetchAllProducts = async () => {
+    const res = await api.get("/products?limit=100");
+    if (!res.data.success) throw new Error(res.data.message || "Failed to fetch products");
+    return res.data.data;
+  };
+
+  const { data: allProducts = [], isLoading: productsLoading } = useQuery({
+    queryKey: ["allProducts"],
+    queryFn: fetchAllProducts,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  // Select one product from each of the first 4 categories
+  const topCategoryProducts = (categoriesLoading || productsLoading)
+    ? []
+    : categories.slice(0, 4).map((cat) =>
+        allProducts.find((prod: any) => prod.category?._id === cat._id)
+      ).filter(Boolean);
 
   return (
     <main
@@ -92,7 +106,11 @@ const Index = () => {
       </section>
 
       {/* Top Ventes */}
-      <TopVentes />
+      {(categoriesLoading || productsLoading) ? (
+        <div className="text-center text-gray-400 py-12">Chargement des produits...</div>
+      ) : (
+        <TopVentes products={topCategoryProducts} limit={4} />
+      )}
 
       {/* Categories */}
       <section className="relative py-12 sm:py-16 px-4 sm:px-6 md:px-12 overflow-hidden">

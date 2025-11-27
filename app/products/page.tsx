@@ -8,24 +8,18 @@ import Pagination from "@/app/components/Pagination";
 import ProductFilters from "../components/ProductFilter";
 import { isPaginatedResponse, PaginationMeta, Product } from "../utils/types";
 import ProductCard from "../components/ProductCrad";
+import { api } from "../lib/api";
 
 // --- Data Fetching Function ---
 async function fetchProducts(
   params: URLSearchParams
 ): Promise<{ products: Product[]; pagination: PaginationMeta }> {
   const queryString = params.toString();
-  const url = `http://localhost:4000/products${
-    queryString ? `?${queryString}` : ""
-  }`;
+  const url = `/products${queryString ? `?${queryString}` : ""}`;
 
-  const res = await fetch(url, { next: { revalidate: 60 } });
-  const data = await res.json();
+  const { data } = await api.get(url);
 
-  if (!isPaginatedResponse<Product>(data)) {
-    throw new Error(data.message || "Erreur lors du chargement des produits");
-  }
-
-  if (!res.ok || !data.success) {
+  if (!data.success || !isPaginatedResponse<Product>(data)) {
     throw new Error(data.message || "Erreur lors du chargement des produits");
   }
 
@@ -76,7 +70,8 @@ export default function ProductsPage() {
   const products = data?.products || [];
   const pagination = data?.pagination;
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
 
   if (isError)
     return (
@@ -131,22 +126,15 @@ export default function ProductsPage() {
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {products.map((product: Product) => {
-                  const normalizedId =
-                    typeof product._id === "string"
-                      ? product._id
-                      : product._id?.$oid || String(product._id);
-
-                  return (
-                    <ProductCard
-                      key={normalizedId}
-                      _id={normalizedId}
-                      name={product.name}
-                      price={product.price}
-                      image={product.image}
-                    />
-                  );
-                })}
+                {products.map((product: Product) => (
+                  <ProductCard
+                    key={product._id}
+                    _id={String(product._id)}
+                    name={product.name}
+                    price={product.price}
+                    image={product.image}
+                  />
+                ))}
               </div>
 
               {pagination && (

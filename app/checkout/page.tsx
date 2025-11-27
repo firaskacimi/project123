@@ -1,12 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import useCart from "../hooks/useCart";
 import type { CartItem } from "@/app/state/cartSlice";
 import { useCreateOrder } from "../hooks/useOrders";
 import { toast } from "sonner";
 import PaymentPlaceholder from "@/app/components/PaymentPlaceholder";
+
+// Extended type for custom PC items
+type CustomCartItem = CartItem & {
+  isCustom: true;
+  components: {
+    category: string;
+    productId: string;
+    name: string;
+    price: number;
+  }[];
+};
 
 export default function CheckoutPage() {
   const { cart, clearCart } = useCart();
@@ -25,54 +36,47 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "card">("cash");
   const [paymentToken, setPaymentToken] = useState<string | null>(null);
 
-  // NEW
-  const [deliveryType, setDeliveryType] = useState<"domicile" | "bureau" | "shop">("domicile");
-  const [wilaya, setWilaya] = useState("");
-  const [deliveryFee, setDeliveryFee] = useState(0);
-
-  const userRaw = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+  const userRaw =
+    typeof window !== "undefined" ? localStorage.getItem("user") : null;
   const user = userRaw ? JSON.parse(userRaw) : null;
 
-  const products = (cart || []).map((item: CartItem) => ({
-    productId: item._id,
-    quantity: item.quantity
-  }));
+  // Regular products (non-custom)
+  const products = (cart || [])
+    .filter((item: CartItem | CustomCartItem) => !("isCustom" in item && item.isCustom))
+    .map((item: CartItem) => ({
+      productId: item._id,
+      quantity: item.quantity,
+    }));
 
+  // Custom PC payload
+  const customCartItem = (cart || []).find(
+    (i: CartItem | CustomCartItem) => "isCustom" in i && i.isCustom
+  ) as CustomCartItem | undefined;
+
+  const customPCPayload = customCartItem
+    ? {
+        name: customCartItem.name || "Custom PC",
+        components: customCartItem.components.map((c) => ({
+          category: c.category,
+          product: c.productId,
+          name: c.name,
+          price: Number(c.price),
+        })),
+        price: Number(customCartItem.price),
+      }
+    : null;
+
+  // Totals
   const subtotal = (cart || []).reduce(
-    (acc: number, i: CartItem) => acc + (i.price || 0) * i.quantity,
+    (acc: number, i: CartItem | CustomCartItem) => acc + (i.price || 0) * i.quantity,
     0
   );
+  const total = subtotal; // Add shipping or taxes if needed
 
-  const total = subtotal + deliveryFee;
-
+  // Handle shipping input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setShipping({ ...shipping, [e.target.name]: e.target.value });
   };
-
-  /** 🔥 Fetch delivery fee from backend */
-  const fetchDeliveryFee = async () => {
-    if (!wilaya || !deliveryType) return;
-
-    try {
-      const res = await fetch("/api/delivery-fee", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ wilaya, deliveryType })
-      });
-
-      const data = await res.json();
-      if (data.success) setDeliveryFee(data.fee);
-      else setDeliveryFee(0);
-    } catch (err) {
-      console.error(err);
-      setDeliveryFee(0);
-    }
-  };
-
-  // Update fee when wilaya or deliveryType changes
-  useEffect(() => {
-    fetchDeliveryFee();
-  }, [wilaya, deliveryType]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,13 +86,8 @@ export default function CheckoutPage() {
       return;
     }
 
-    if (products.length === 0) {
+    if (products.length === 0 && !customPCPayload) {
       toast.error("Cart is empty.");
-      return;
-    }
-
-    if (deliveryType !== "shop" && !wilaya) {
-      toast.error("Please select your wilaya.");
       return;
     }
 
@@ -97,16 +96,15 @@ export default function CheckoutPage() {
       shipping,
       paymentMethod,
       user: user._id,
-      deliveryType,
-      wilaya,
     };
 
-    if (paymentMethod === "card" && !paymentToken) {
-      toast.error("Create payment token first.");
-      return;
-    }
+    if (customPCPayload) payload.customPC = customPCPayload;
 
     if (paymentMethod === "card") {
+      if (!paymentToken) {
+        toast.error("Create payment token first.");
+        return;
+      }
       payload.paymentToken = paymentToken;
     }
 
@@ -124,8 +122,7 @@ export default function CheckoutPage() {
   };
 
   const isPlacing =
-    (createOrder as any)?.isLoading ||
-    (createOrder as any)?.status === "loading";
+    (createOrder as any)?.isLoading || (createOrder as any)?.status === "loading";
 
   return (
     <div className="min-h-screen p-6 flex items-start justify-center bg-neutral-950 text-white">
@@ -133,57 +130,69 @@ export default function CheckoutPage() {
         <h1 className="text-2xl font-bold mb-4">Checkout</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          
           {/* SHIPPING */}
           <h2 className="font-semibold mb-2">Shipping</h2>
-          <input name="fullName" value={shipping.fullName} onChange={handleChange} placeholder="Full name" className="w-full p-3 rounded bg-neutral-900" />
-          <input name="address" value={shipping.address} onChange={handleChange} placeholder="Address" className="w-full p-3 rounded bg-neutral-900" />
+          <input
+            name="fullName"
+            value={shipping.fullName}
+            onChange={handleChange}
+            placeholder="Full name"
+            className="w-full p-3 rounded bg-neutral-900"
+          />
+          <input
+            name="address"
+            value={shipping.address}
+            onChange={handleChange}
+            placeholder="Address"
+            className="w-full p-3 rounded bg-neutral-900"
+          />
           <div className="grid grid-cols-2 gap-2">
-            <input name="city" value={shipping.city} onChange={handleChange} placeholder="City" className="p-3 rounded bg-neutral-900" />
-            <input name="postalCode" value={shipping.postalCode} onChange={handleChange} placeholder="Postal code" className="p-3 rounded bg-neutral-900" />
+            <input
+              name="city"
+              value={shipping.city}
+              onChange={handleChange}
+              placeholder="City"
+              className="p-3 rounded bg-neutral-900"
+            />
+            <input
+              name="postalCode"
+              value={shipping.postalCode}
+              onChange={handleChange}
+              placeholder="Postal code"
+              className="p-3 rounded bg-neutral-900"
+            />
           </div>
-          <input name="country" value={shipping.country} onChange={handleChange} placeholder="Country" className="w-full p-3 rounded bg-neutral-900" />
-          <input name="phone" value={shipping.phone} onChange={handleChange} placeholder="Phone" className="w-full p-3 rounded bg-neutral-900" />
-
-          {/* DELIVERY TYPE */}
-          <h3 className="font-semibold mt-4">Delivery Type</h3>
-          <select
-            className="w-full p-3 bg-neutral-900 rounded"
-            value={deliveryType}
-            onChange={(e) => setDeliveryType(e.target.value as any)}
-          >
-            <option value="domicile">Home Delivery</option>
-            <option value="bureau">Office Delivery</option>
-            <option value="shop">Pickup (Free)</option>
-          </select>
-
-          {/* WILAYA */}
-          {deliveryType !== "shop" && (
-            <>
-              <h3 className="font-semibold">Wilaya</h3>
-              <select
-                className="w-full p-3 bg-neutral-900 rounded"
-                value={wilaya}
-                onChange={(e) => setWilaya(e.target.value)}
-              >
-                <option value="">Select wilaya...</option>
-                {Array.from({ length: 58 }).map((_, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    Wilaya {i + 1}
-                  </option>
-                ))}
-              </select>
-            </>
-          )}
+          <input
+            name="country"
+            value={shipping.country}
+            onChange={handleChange}
+            placeholder="Country"
+            className="w-full p-3 rounded bg-neutral-900"
+          />
+          <input
+            name="phone"
+            value={shipping.phone}
+            onChange={handleChange}
+            placeholder="Phone"
+            className="w-full p-3 rounded bg-neutral-900"
+          />
 
           {/* PAYMENT */}
           <h3 className="font-semibold mt-4">Payment</h3>
           <label className="inline-flex items-center mr-4 mt-2">
-            <input type="radio" checked={paymentMethod === "cash"} onChange={() => setPaymentMethod("cash")} />
+            <input
+              type="radio"
+              checked={paymentMethod === "cash"}
+              onChange={() => setPaymentMethod("cash")}
+            />
             <span className="ml-2">Cash</span>
           </label>
           <label className="inline-flex items-center mr-4 mt-2">
-            <input type="radio" checked={paymentMethod === "card"} onChange={() => setPaymentMethod("card")} />
+            <input
+              type="radio"
+              checked={paymentMethod === "card"}
+              onChange={() => setPaymentMethod("card")}
+            />
             <span className="ml-2">Card (simulated)</span>
           </label>
 
@@ -197,14 +206,15 @@ export default function CheckoutPage() {
               <div className="text-sm text-gray-400">Subtotal</div>
               <div className="font-semibold">{subtotal.toFixed(2)} DA</div>
 
-              <div className="text-sm text-gray-400 mt-2">Delivery Fee</div>
-              <div className="font-semibold">{deliveryFee} DA</div>
-
               <div className="text-sm text-gray-400 mt-2">Total</div>
-              <div className="font-semibold text-lg">{total} DA</div>
+              <div className="font-semibold text-lg">{total.toFixed(2)} DA</div>
             </div>
 
-            <button type="submit" disabled={!!isPlacing} className="bg-cyan-500 px-5 py-2 rounded font-semibold text-black">
+            <button
+              type="submit"
+              disabled={!!isPlacing}
+              className="bg-cyan-500 px-5 py-2 rounded font-semibold text-black"
+            >
               {isPlacing ? "Placing..." : "Place Order"}
             </button>
           </div>

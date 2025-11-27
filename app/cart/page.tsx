@@ -17,9 +17,18 @@ export default function CartPage() {
     0
   );
 
-  // Use removeFromCart from useCart
-  const handleRemove = (productId: string) => {
-    removeFromCart(productId);
+  // Decrease quantity safely
+  const handleDecrease = (item: CartItem) => {
+    if (item.quantity > 1) {
+      addToCart({ ...item, quantity: -1 });
+    } else {
+      removeFromCart(item._id);
+    }
+  };
+
+  // Increase quantity
+  const handleIncrease = (item: CartItem) => {
+    addToCart({ ...item, quantity: 1 });
   };
 
   if (!cart || cart.length === 0)
@@ -50,7 +59,7 @@ export default function CartPage() {
         <div className="flex-1 flex flex-col gap-6">
           {cart.map((item: CartItem) => (
             <div
-              key={item.productId}
+              key={item._id} // FIXED: use _id
               className="flex flex-col md:flex-row items-center md:items-start justify-between bg-[#0f172a] border border-cyan-900/40 p-5 rounded-xl gap-4 md:gap-6"
             >
               {item.image && (
@@ -71,7 +80,7 @@ export default function CartPage() {
 
                 <div className="flex items-center gap-3 mt-4 md:mt-0">
                   <button
-                    onClick={() => addToCart({ ...item, quantity: -1 })}
+                    onClick={() => handleDecrease(item)}
                     className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded"
                   >
                     −
@@ -80,7 +89,7 @@ export default function CartPage() {
                   <span className="font-semibold text-lg">{item.quantity}</span>
 
                   <button
-                    onClick={() => addToCart({ ...item, quantity: 1 })}
+                    onClick={() => handleIncrease(item)}
                     className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded"
                   >
                     +
@@ -124,7 +133,7 @@ export default function CartPage() {
 
       {/* SUGGESTIONS */}
       <SuggestedProducts
-        excludeIds={cart.map((item) => item.productId)}
+        excludeIds={cart.map((item) => item._id)} // FIXED: use _id
         limit={4}
       />
     </div>

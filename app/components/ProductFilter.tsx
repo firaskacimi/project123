@@ -23,7 +23,7 @@ export default function ProductFilters() {
   const searchParams = useSearchParams();
 
   const initialMinPrice = Number(searchParams.get("minPrice") || 0);
-  const initialMaxPrice = Number(searchParams.get("maxPrice") || 1000); // default max
+  const initialMaxPrice = Number(searchParams.get("maxPrice") || 3000); // default max
   const initialCategory = searchParams.get("category") || "";
 
   const [minPrice, setMinPrice] = useState(initialMinPrice);
@@ -76,7 +76,7 @@ export default function ProductFilters() {
 
   const handleResetFilters = () => {
     setMinPrice(0);
-    setMaxPrice(1000);
+    setMaxPrice(3000);
     setSelectedCategory("");
     const params = new URLSearchParams(searchParams.toString());
     params.delete("minPrice");
@@ -87,7 +87,7 @@ export default function ProductFilters() {
   };
 
   const hasActiveFilters =
-    minPrice !== 0 || maxPrice !== 1000 || selectedCategory;
+    minPrice !== 0 || maxPrice !== 3000 || selectedCategory;
 
   return (
     <div className="w-full md:w-64 bg-[#111827] border border-cyan-800 rounded-2xl p-6 flex flex-col gap-6 shadow-xl sticky top-24">
