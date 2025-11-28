@@ -4,7 +4,7 @@
  */
 
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import { apiClient } from "@/app/lib/api/client";
+import { api } from "@/app/lib/api";
 import { ENDPOINTS } from "@/app/lib/api/endpoints";
 import { queryKeys } from "@/app/lib/api/queryKeys";
 import { handleAxiosError } from "@/app/lib/api/errors";
@@ -18,7 +18,7 @@ export function useGetCategories(): UseQueryResult<Category[], Error> {
     queryKey: queryKeys.categories.list(),
     queryFn: async () => {
       try {
-        const response = await apiClient.get(ENDPOINTS.CATEGORIES.LIST);
+        const response = await api.get(ENDPOINTS.CATEGORIES.LIST);
         return response.data.data;
       } catch (error) {
         throw handleAxiosError(error);
@@ -40,7 +40,7 @@ export function useGetCategoryById(
     queryKey: queryKeys.categories.detail(categoryId),
     queryFn: async () => {
       try {
-        const response = await apiClient.get(ENDPOINTS.CATEGORIES.DETAIL(categoryId));
+        const response = await api.get(ENDPOINTS.CATEGORIES.DETAIL(categoryId));
         return response.data.data;
       } catch (error) {
         throw handleAxiosError(error);

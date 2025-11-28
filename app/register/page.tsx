@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { api } from "@/app/lib/axios";
 
 interface User {
   _id: string;
@@ -37,13 +38,9 @@ export default function RegisterPage() {
   const registerMutation = useMutation<RegisterResponse, Error, { firstName: string; lastName: string; email: string; password: string }>({
     mutationKey: ["register"],
     mutationFn: async (userData) => {
-      const res = await fetch("http://localhost:4000/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(userData),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Erreur lors de l'inscription");
+      const res = await api.post("/auth/register", userData);
+      const data = res.data;
+      if (!data.success) throw new Error(data?.message || "Erreur lors de l'inscription");
       return data;
     },
     onSuccess: (data) => {

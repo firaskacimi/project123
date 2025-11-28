@@ -3,7 +3,7 @@
  * Centralizes all API-related exports for easy importing
  */
 
-export { apiClient as default, setAuthToken, clearAuthToken } from "./client";
+export { api, api as default, setAuthToken, clearAuthToken } from "@/app/lib/axios";
 export { ENDPOINTS } from "./endpoints";
 export type {
   ApiResponse,

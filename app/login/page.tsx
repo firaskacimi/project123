@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { api } from "@/app/lib/axios";
 
 interface CartItem {
   productId: string;
@@ -43,13 +44,9 @@ export default function LoginPage() {
   const loginMutation = useMutation<LoginResponse, Error, { email: string; password: string }>({
     mutationKey: ["login"],
     mutationFn: async (credentials) => {
-      const res = await fetch("http://localhost:4000/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(credentials),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Échec de la connexion");
+      const res = await api.post("/auth/login", credentials);
+      const data = res.data;
+      if (!data.success) throw new Error(data?.message || "Échec de la connexion");
       return data;
     },
     onSuccess: (data) => {

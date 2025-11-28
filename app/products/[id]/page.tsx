@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import ProductDetailsCard from "@/app/components/ProductDetailsCard";
 import SuggestedProducts from "@/app/components/SuggestedProducts";
 import { Product } from "@/app/utils/types";
+import { api } from "@/app/lib/axios";
 
 export default function ProductDetails() {
   const params = useParams();
@@ -22,10 +23,10 @@ export default function ProductDetails() {
     queryFn: async () => {
       if (!productId) throw new Error("Product ID missing");
 
-      const res = await fetch(`http://localhost:4000/products/${productId}`);
-      const data = await res.json();
+      const res = await api.get(`/products/${productId}`);
+      const data = res.data;
 
-      if (!res.ok || !data.success) {
+      if (!data.success) {
         throw new Error(data.message || "Erreur lors du chargement du produit");
       }
       return data.data;

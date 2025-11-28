@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { api } from "@/app/lib/axios";
 import { isPaginatedResponse, PaginationMeta } from "../utils/types";
 
 export function useApi() {
@@ -7,8 +8,8 @@ export function useApi() {
       url: string
     ): Promise<{ data: T[]; pagination: PaginationMeta } | null> => {
       try {
-        const res = await fetch(url);
-        const responseData = await res.json();
+        const res = await api.get(url);
+        const responseData = res.data;
 
         // Validate response format
         if (!isPaginatedResponse<T>(responseData)) {
@@ -16,10 +17,6 @@ export function useApi() {
             responseData.message ||
               "Réponse API invalide - format attendu non reçu"
           );
-        }
-
-        if (!res.ok) {
-          throw new Error(responseData.message || "Erreur API");
         }
 
         return {

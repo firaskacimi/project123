@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ProductCard from "./ProductCrad";
+import { api } from "@/app/lib/axios";
 
 export interface SuggestionProduct {
   _id: string;
@@ -29,13 +30,13 @@ export default function SuggestedProducts({
   useEffect(() => {
     const fetchSuggestions = async () => {
       try {
-        const url = new URL("http://localhost:4000/products");
-        if (category) url.searchParams.append("category", category);
+        const params = new URLSearchParams();
+        if (category) params.append("category", category);
 
-        const res = await fetch(url.toString());
-        const data = await res.json();
+        const res = await api.get(`/products?${params.toString()}`);
+        const data = res.data;
 
-        if (res.ok && data.success) {
+        if (data.success) {
           // Exclude products in excludeIds
           const filtered = data.data.filter(
             (p: SuggestionProduct) => !excludeIds.includes(p._id)

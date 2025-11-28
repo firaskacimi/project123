@@ -1,19 +1,7 @@
-"use client";
+import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 
-import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from "axios";
-
-/**
- * API Client Configuration
- * Handles base URL, interceptors, retry logic, and authentication
- */
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-
-/**
- * Create and configure the Axios instance
- */
-export const apiClient: AxiosInstance = axios.create({
-  baseURL: BASE_URL,
+export const api = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000",
   headers: {
     "Content-Type": "application/json",
   },
@@ -24,7 +12,7 @@ export const apiClient: AxiosInstance = axios.create({
  * Request Interceptor
  * Adds authentication token to all requests
  */
-apiClient.interceptors.request.use(
+api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // Add token to headers if available
     if (typeof window !== "undefined") {
@@ -50,7 +38,7 @@ apiClient.interceptors.request.use(
  * Response Interceptor
  * Handles errors and logs responses
  */
-apiClient.interceptors.response.use(
+api.interceptors.response.use(
   (response) => {
     // Dev logging
     if (process.env.NODE_ENV === "development") {
@@ -75,32 +63,26 @@ apiClient.interceptors.response.use(
 );
 
 /**
- * Set Authorization Token
- * Call after login to add token to all requests
+ * Set the Authorization header for all future requests.
+ * Call this after storing token in localStorage so protected endpoints work.
  */
-export function setAuthToken(token: string | null) {
+export function setAuthToken(token?: string | null) {
   if (token) {
-    apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     if (typeof window !== "undefined") {
       localStorage.setItem("token", token);
     }
   } else {
-    delete apiClient.defaults.headers.common["Authorization"];
+    delete api.defaults.headers.common["Authorization"];
     if (typeof window !== "undefined") {
       localStorage.removeItem("token");
     }
   }
 }
 
-/**
- * Clear Authorization Token
- * Call on logout
- */
 export function clearAuthToken() {
-  delete apiClient.defaults.headers.common["Authorization"];
+  delete api.defaults.headers.common["Authorization"];
   if (typeof window !== "undefined") {
     localStorage.removeItem("token");
   }
 }
-
-export default apiClient;

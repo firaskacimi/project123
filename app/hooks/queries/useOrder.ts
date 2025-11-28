@@ -4,7 +4,7 @@
  */
 
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import { apiClient } from "@/app/lib/api/client";
+import { api } from "@/app/lib/api";
 import { ENDPOINTS } from "@/app/lib/api/endpoints";
 import { queryKeys } from "@/app/lib/api/queryKeys";
 import { handleAxiosError } from "@/app/lib/api/errors";
@@ -21,7 +21,7 @@ export function useGetOrders(
     queryKey: queryKeys.orders.list(),
     queryFn: async () => {
       try {
-        const response = await apiClient.get(
+        const response = await api.get(
           `${ENDPOINTS.ORDERS.LIST}?page=${page}&limit=${limit}`
         );
         return response.data;
@@ -44,7 +44,7 @@ export function useGetOrderById(
     queryKey: queryKeys.orders.detail(orderId),
     queryFn: async () => {
       try {
-        const response = await apiClient.get(ENDPOINTS.ORDERS.DETAIL(orderId));
+        const response = await api.get(ENDPOINTS.ORDERS.DETAIL(orderId));
         return response.data.data;
       } catch (error) {
         throw handleAxiosError(error);

@@ -4,17 +4,18 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Category, isPaginatedResponse } from "../utils/types";
+import { api } from "../lib/axios";
 
 async function fetchCategories(): Promise<Category[]> {
-  const res = await fetch("http://localhost:4000/category");
-  const data = await res.json();
+  const res = await api.get("/categories");
+  const data = res.data;
 
   if (isPaginatedResponse<Category>(data)) {
-    if (!res.ok || !data.success) throw new Error(data.message);
+    if (res.status !== 200 || !data.success) throw new Error(data.message);
     return data.data;
   }
 
-  if (!res.ok || !data.success) throw new Error(data.message);
+  if (res.status !== 200 || !data.success) throw new Error(data.message);
   return Array.isArray(data.data) ? data.data : [];
 }
 

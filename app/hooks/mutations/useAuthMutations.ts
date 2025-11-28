@@ -4,7 +4,7 @@
  */
 
 import { useMutation, UseMutationResult, useQueryClient } from "@tanstack/react-query";
-import { apiClient, setAuthToken, clearAuthToken } from "@/app/lib/api/client";
+import { api, setAuthToken, clearAuthToken } from "@/app/lib/api";
 import { ENDPOINTS } from "@/app/lib/api/endpoints";
 import { queryKeys } from "@/app/lib/api/queryKeys";
 import { handleAxiosError } from "@/app/lib/api/errors";
@@ -23,7 +23,7 @@ export function useLogin(): UseMutationResult<
   return useMutation({
     mutationFn: async (loginData: LoginRequest) => {
       try {
-        const response = await apiClient.post(
+        const response = await api.post(
           ENDPOINTS.AUTH.LOGIN,
           loginData
         );
@@ -55,7 +55,7 @@ export function useRegister(): UseMutationResult<
   return useMutation({
     mutationFn: async (registerData: RegisterRequest) => {
       try {
-        const response = await apiClient.post(
+        const response = await api.post(
           ENDPOINTS.AUTH.REGISTER,
           registerData
         );
@@ -83,7 +83,7 @@ export function useLogout(): UseMutationResult<void, Error, void> {
   return useMutation({
     mutationFn: async () => {
       try {
-        await apiClient.post(ENDPOINTS.AUTH.LOGOUT);
+        await api.post(ENDPOINTS.AUTH.LOGOUT);
       } catch (error) {
         throw handleAxiosError(error);
       }
@@ -111,7 +111,7 @@ export function useUpdateProfile(): UseMutationResult<
   return useMutation({
     mutationFn: async (profileData: Partial<User>) => {
       try {
-        const response = await apiClient.put(
+        const response = await api.put(
           ENDPOINTS.USERS.UPDATE,
           profileData
         );

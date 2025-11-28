@@ -4,7 +4,7 @@
  */
 
 import { useMutation, UseMutationResult, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@/app/lib/api/client";
+import { api } from "@/app/lib/api";
 import { ENDPOINTS } from "@/app/lib/api/endpoints";
 import { queryKeys } from "@/app/lib/api/queryKeys";
 import { handleAxiosError } from "@/app/lib/api/errors";
@@ -23,7 +23,7 @@ export function useCreateProduct(): UseMutationResult<
   return useMutation({
     mutationFn: async (productData: Partial<Product>) => {
       try {
-        const response = await apiClient.post(
+        const response = await api.post(
           ENDPOINTS.PRODUCTS.LIST,
           productData
         );
@@ -56,7 +56,7 @@ export function useUpdateProduct(
   return useMutation({
     mutationFn: async (productData: Partial<Product>) => {
       try {
-        const response = await apiClient.put(
+        const response = await api.put(
           ENDPOINTS.PRODUCTS.DETAIL(productId),
           productData
         );
@@ -91,7 +91,7 @@ export function useDeleteProduct(): UseMutationResult<
   return useMutation({
     mutationFn: async (productId: string) => {
       try {
-        await apiClient.delete(ENDPOINTS.PRODUCTS.DETAIL(productId));
+        await api.delete(ENDPOINTS.PRODUCTS.DETAIL(productId));
       } catch (error) {
         throw handleAxiosError(error);
       }

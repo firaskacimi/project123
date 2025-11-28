@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { api } from "@/app/lib/axios";
 
 export default function ContactUsPage() {
   const [fadeIn, setFadeIn] = useState(false);
@@ -17,14 +18,9 @@ export default function ContactUsPage() {
 
     try {
       // Replace with your backend endpoint
-      const res = await fetch("http://localhost:4000/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to send message");
+      const res = await api.post("/contact", { name, email, message });
+      const data = res.data;
+      if (!data.success) throw new Error(data.message || "Failed to send message");
 
       toast.success("Message envoyé avec succès !");
       setName("");

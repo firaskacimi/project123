@@ -4,7 +4,7 @@
  */
 
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import { apiClient } from "@/app/lib/api/client";
+import { api } from "@/app/lib/api";
 import { ENDPOINTS } from "@/app/lib/api/endpoints";
 import { queryKeys } from "@/app/lib/api/queryKeys";
 import { handleAxiosError } from "@/app/lib/api/errors";
@@ -30,7 +30,7 @@ export function useGetProducts(
         if (filters?.sortBy) params.append("sortBy", filters.sortBy);
         if (filters?.sortOrder) params.append("sortOrder", filters.sortOrder);
 
-        const response = await apiClient.get(
+        const response = await api.get(
           `${ENDPOINTS.PRODUCTS.LIST}?${params.toString()}`
         );
         return response.data;
@@ -54,7 +54,7 @@ export function useGetProductById(
     queryKey: queryKeys.products.detail(productId),
     queryFn: async () => {
       try {
-        const response = await apiClient.get(ENDPOINTS.PRODUCTS.DETAIL(productId));
+        const response = await api.get(ENDPOINTS.PRODUCTS.DETAIL(productId));
         return response.data.data;
       } catch (error) {
         throw handleAxiosError(error);
@@ -77,7 +77,7 @@ export function useGetProductsByCategory(
     queryKey: queryKeys.products.byCategory(categoryId),
     queryFn: async () => {
       try {
-        const response = await apiClient.get(
+        const response = await api.get(
           `${ENDPOINTS.PRODUCTS.LIST}?category=${categoryId}&limit=${limit}`
         );
         return response.data.data;
@@ -102,7 +102,7 @@ export function useSearchProducts(
     queryKey: queryKeys.products.search(query),
     queryFn: async () => {
       try {
-        const response = await apiClient.get(
+        const response = await api.get(
           `${ENDPOINTS.PRODUCTS.LIST}?search=${encodeURIComponent(query)}&limit=${limit}`
         );
         return response.data.data;

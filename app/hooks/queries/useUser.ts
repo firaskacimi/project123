@@ -4,7 +4,7 @@
  */
 
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import { apiClient } from "@/app/lib/api/client";
+import { api } from "@/app/lib/api";
 import { ENDPOINTS } from "@/app/lib/api/endpoints";
 import { queryKeys } from "@/app/lib/api/queryKeys";
 import { handleAxiosError } from "@/app/lib/api/errors";
@@ -18,7 +18,7 @@ export function useGetCurrentUser(): UseQueryResult<User, Error> {
     queryKey: queryKeys.auth.me(),
     queryFn: async () => {
       try {
-        const response = await apiClient.get(ENDPOINTS.USERS.PROFILE);
+        const response = await api.get(ENDPOINTS.USERS.PROFILE);
         return response.data.data;
       } catch (error) {
         throw handleAxiosError(error);
@@ -40,7 +40,7 @@ export function useGetUserById(
     queryKey: queryKeys.users.detail(userId),
     queryFn: async () => {
       try {
-        const response = await apiClient.get(ENDPOINTS.USERS.DETAIL(userId));
+        const response = await api.get(ENDPOINTS.USERS.DETAIL(userId));
         return response.data.data;
       } catch (error) {
         throw handleAxiosError(error);

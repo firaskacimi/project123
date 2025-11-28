@@ -4,7 +4,7 @@
  */
 
 import { useMutation, UseMutationResult, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@/app/lib/api/client";
+import { api } from "@/app/lib/api";
 import { ENDPOINTS } from "@/app/lib/api/endpoints";
 import { queryKeys } from "@/app/lib/api/queryKeys";
 import { handleAxiosError } from "@/app/lib/api/errors";
@@ -23,7 +23,7 @@ export function useCreateOrder(): UseMutationResult<
   return useMutation({
     mutationFn: async (orderData: Partial<Order>) => {
       try {
-        const response = await apiClient.post(ENDPOINTS.ORDERS.CREATE, orderData);
+        const response = await api.post(ENDPOINTS.ORDERS.CREATE, orderData);
         return response.data.data;
       } catch (error) {
         throw handleAxiosError(error);
@@ -53,7 +53,7 @@ export function useUpdateOrder(
   return useMutation({
     mutationFn: async (orderData: Partial<Order>) => {
       try {
-        const response = await apiClient.put(
+        const response = await api.put(
           ENDPOINTS.ORDERS.UPDATE(orderId),
           orderData
         );
@@ -84,7 +84,7 @@ export function useDeleteOrder(): UseMutationResult<void, Error, string> {
   return useMutation({
     mutationFn: async (orderId: string) => {
       try {
-        await apiClient.delete(ENDPOINTS.ORDERS.DELETE(orderId));
+        await api.delete(ENDPOINTS.ORDERS.DELETE(orderId));
       } catch (error) {
         throw handleAxiosError(error);
       }
