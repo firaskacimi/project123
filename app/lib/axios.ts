@@ -14,7 +14,6 @@ export const api = axios.create({
  */
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Add token to headers if available
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("token");
       if (token) {

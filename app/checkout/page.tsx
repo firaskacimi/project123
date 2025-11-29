@@ -14,6 +14,7 @@ type CustomCartItem = CartItem & {
   components: {
     category: string;
     productId: string;
+    image?: "./gaming-pc.jpg";
     name: string;
     price: number;
   }[];
@@ -33,7 +34,7 @@ export default function CheckoutPage() {
     phone: "",
   });
 
-  const [paymentMethod, setPaymentMethod] = useState<"cash" | "card">("cash");
+  const [paymentMethod, setPaymentMethod] = useState<"cash" | "desk">("cash");
   const [paymentToken, setPaymentToken] = useState<string | null>(null);
 
   const userRaw =
@@ -60,6 +61,7 @@ export default function CheckoutPage() {
           category: c.category,
           product: c.productId,
           name: c.name,
+          image: c.image || "/gaming-pc.jpg",
           price: Number(c.price),
         })),
         price: Number(customCartItem.price),
@@ -99,14 +101,6 @@ export default function CheckoutPage() {
     };
 
     if (customPCPayload) payload.customPC = customPCPayload;
-
-    if (paymentMethod === "card") {
-      if (!paymentToken) {
-        toast.error("Create payment token first.");
-        return;
-      }
-      payload.paymentToken = paymentToken;
-    }
 
     createOrder.mutate(payload, {
       onSuccess: () => {
@@ -190,16 +184,11 @@ export default function CheckoutPage() {
           <label className="inline-flex items-center mr-4 mt-2">
             <input
               type="radio"
-              checked={paymentMethod === "card"}
-              onChange={() => setPaymentMethod("card")}
+              checked={paymentMethod === "desk"}
+              onChange={() => setPaymentMethod("desk")}
             />
-            <span className="ml-2">Card (simulated)</span>
+            <span className="ml-2">desk</span>
           </label>
-
-          {paymentMethod === "card" && (
-            <PaymentPlaceholder onToken={(t) => setPaymentToken(t)} />
-          )}
-
           {/* TOTAL */}
           <div className="mt-4 flex items-center justify-between">
             <div>

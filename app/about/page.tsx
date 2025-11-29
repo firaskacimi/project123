@@ -34,11 +34,9 @@ export default function AboutUsPage() {
       </section>
 
       {/* Team Section */}
-      <section className="max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-8 animate-fadeInUp delay-200">
+      <section className="max-w-7xl w-5xl h-80 grid grid-cols-1 md:grid-cols-1 gap-8 animate-fadeInUp delay-200">
         {[
-          { name: "Firas Kacimi", role: "Founder & CEO", img: "/team/firas.jpg" },
-          { name: "Alex Johnson", role: "Lead Designer", img: "/team/alex.jpg" },
-          { name: "Sara Lee", role: "Marketing Head", img: "/team/sara.jpg" },
+          { name: "Firas Kacimi", role: "Founder & CEO", details:"a pationate pahrmacy student and gomycode web developer graduate", img: "/ME.jpg" },
         ].map((member) => (
           <div
             key={member.name}
@@ -49,6 +47,7 @@ export default function AboutUsPage() {
             </div>
             <h3 className="text-xl font-bold mb-1">{member.name}</h3>
             <p className="text-gray-400">{member.role}</p>
+            <p className="text-white text-center mt-2">"{member.details}"</p>
           </div>
         ))}
       </section>

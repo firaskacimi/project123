@@ -7,7 +7,7 @@ import { Category, isPaginatedResponse } from "../utils/types";
 import { api } from "../lib/axios";
 
 async function fetchCategories(): Promise<Category[]> {
-  const res = await api.get("/categories");
+  const res = await api.get("/category");
   const data = res.data;
 
   if (isPaginatedResponse<Category>(data)) {
@@ -34,7 +34,7 @@ export default function ProductFilters() {
   const { data: categories = [], isLoading: categoriesLoading } = useQuery<
     Category[]
   >({
-    queryKey: ["categories"],
+    queryKey: ["category"],
     queryFn: fetchCategories,
     staleTime: 1000 * 60 * 5,
   });
