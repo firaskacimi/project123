@@ -22,7 +22,6 @@
     "react-redux": "^9.2.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
-    "toast": "^0.5.4",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
@@ -31,6 +30,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-redux": "^7.1.34",
+    "baseline-browser-mapping": "2.8.32",
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
     "tailwindcss": "^4",
